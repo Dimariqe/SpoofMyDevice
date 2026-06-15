@@ -586,6 +586,7 @@ public class ConfigManager {
 
         defaults.put("gsm.operator.alpha", "T-Mobile");
         defaults.put("gsm.operator.numeric", "310260");
+        defaults.put("gsm.operator.iso-country", "us");
         defaults.put("gsm.sim.operator.alpha", "T-Mobile");
         defaults.put("gsm.sim.operator.numeric", "310260");
         defaults.put("gsm.sim.operator.iso-country", "us");
@@ -598,7 +599,11 @@ public class ConfigManager {
 
     private static String getConfigValue(String key) {
         ensureFreshConfig();
-        return allProperties.get(key);
+        String val = allProperties.get(key);
+        if (val == null && key.equals("gsm.operator.iso-country")) {
+            val = allProperties.get("gsm.sim.operator.iso-country");
+        }
+        return val;
     }
 
     private static boolean hasConfigValue(String key) {
@@ -654,6 +659,9 @@ public class ConfigManager {
                 continue;
             }
             result.put(key, entry.getValue() == null ? "" : entry.getValue());
+        }
+        if (!result.containsKey("gsm.operator.iso-country") && result.containsKey("gsm.sim.operator.iso-country")) {
+            result.put("gsm.operator.iso-country", result.get("gsm.sim.operator.iso-country"));
         }
         return result;
     }
@@ -717,7 +725,8 @@ public class ConfigManager {
             || getSystemProperty("gsm.sim.operator.numeric", null) != null
             || getSystemProperty("gsm.sim.operator.iso-country", null) != null
             || getSystemProperty("gsm.operator.alpha", null) != null
-            || getSystemProperty("gsm.operator.numeric", null) != null;
+            || getSystemProperty("gsm.operator.numeric", null) != null
+            || getSystemProperty("gsm.operator.iso-country", null) != null;
     }
 
     public static int getScreenWidth() {
@@ -874,7 +883,7 @@ public class ConfigManager {
         if (key.equals("gsm.operator.numeric") || key.equals("gsm.sim.operator.numeric")) {
             return FIELD_OPERATOR_NUMERIC;
         }
-        if (key.equals("gsm.sim.operator.iso-country")) {
+        if (key.equals("gsm.sim.operator.iso-country") || key.equals("gsm.operator.iso-country")) {
             return FIELD_SIM_COUNTRY;
         }
         if (key.equals("persist.sys.timezone")) {
@@ -1107,4 +1116,3 @@ public class ConfigManager {
         }
     }
 }
-

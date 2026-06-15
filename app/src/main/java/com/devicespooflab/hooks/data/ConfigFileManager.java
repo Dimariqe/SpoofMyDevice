@@ -259,6 +259,7 @@ public class ConfigFileManager {
         builder.append("\n# Carrier\n");
         append(builder, "gsm.operator.alpha", profile.getOperatorAlpha());
         append(builder, "gsm.operator.numeric", profile.getOperatorNumeric());
+        append(builder, "gsm.operator.iso-country", profile.getSimCountryIso());
         append(builder, "gsm.sim.operator.alpha", profile.getSimOperatorAlpha());
         append(builder, "gsm.sim.operator.numeric", profile.getSimOperatorNumeric());
         append(builder, "gsm.sim.operator.iso-country", profile.getSimCountryIso());
@@ -513,6 +514,7 @@ public class ConfigFileManager {
             "ANDROID_ID",
             "gsm.operator.alpha",
             "gsm.operator.numeric",
+            "gsm.operator.iso-country",
             "gsm.sim.operator.alpha",
             "gsm.sim.operator.numeric",
             "gsm.sim.operator.iso-country",

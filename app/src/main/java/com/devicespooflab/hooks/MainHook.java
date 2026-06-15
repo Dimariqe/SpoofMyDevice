@@ -11,6 +11,8 @@ import com.devicespooflab.hooks.hooks.GetPropHooks;
 import com.devicespooflab.hooks.hooks.HardwareHooks;
 import com.devicespooflab.hooks.hooks.JavaSystemPropertyHooks;
 import com.devicespooflab.hooks.hooks.MediaDrmHooks;
+import com.devicespooflab.hooks.hooks.EnvironmentHooks;
+import com.devicespooflab.hooks.hooks.LocationAndWifiHooks;
 import com.devicespooflab.hooks.hooks.PackageManagerHooks;
 import com.devicespooflab.hooks.hooks.SettingsHooks;
 import com.devicespooflab.hooks.hooks.SystemPropertiesHooks;
@@ -75,6 +77,20 @@ public class MainHook implements IXposedHookLoadPackage {
             XposedBridge.log(TAG + ": JavaSystemPropertyHooks loaded");
         } catch (Exception exception) {
             XposedBridge.log(TAG + ": JavaSystemPropertyHooks failed: " + exception.getMessage());
+        }
+
+        try {
+            EnvironmentHooks.hook(lpparam);
+            XposedBridge.log(TAG + ": EnvironmentHooks loaded");
+        } catch (Exception exception) {
+            XposedBridge.log(TAG + ": EnvironmentHooks failed: " + exception.getMessage());
+        }
+
+        try {
+            LocationAndWifiHooks.hook(lpparam);
+            XposedBridge.log(TAG + ": LocationAndWifiHooks loaded");
+        } catch (Exception exception) {
+            XposedBridge.log(TAG + ": LocationAndWifiHooks failed: " + exception.getMessage());
         }
 
         try {

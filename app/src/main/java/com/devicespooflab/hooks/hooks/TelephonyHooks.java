@@ -69,6 +69,10 @@ public class TelephonyHooks {
                     new XC_MethodHook() {
                         @Override
                         protected void afterHookedMethod(MethodHookParam param) {
+                            if (param.args.length > 0 && param.args[0] instanceof Integer) {
+                                int idx = (Integer) param.args[0];
+                                if (idx > 1) return;
+                            }
                             if (!ConfigManager.shouldExposeTelephony()) {
                                 param.setResult(null);
                                 return;
@@ -105,6 +109,10 @@ public class TelephonyHooks {
                     new XC_MethodHook() {
                         @Override
                         protected void afterHookedMethod(MethodHookParam param) {
+                            if (param.args.length > 0 && param.args[0] instanceof Integer) {
+                                int idx = (Integer) param.args[0];
+                                if (idx > 1) return;
+                            }
                             if (!ConfigManager.shouldExposeTelephony()) {
                                 param.setResult(null);
                                 return;
@@ -141,6 +149,10 @@ public class TelephonyHooks {
                     new XC_MethodHook() {
                         @Override
                         protected void afterHookedMethod(MethodHookParam param) {
+                            if (param.args.length > 0 && param.args[0] instanceof Integer) {
+                                int idx = (Integer) param.args[0];
+                                if (idx > 1) return;
+                            }
                             if (!ConfigManager.shouldExposeTelephony()) {
                                 param.setResult(null);
                                 return;
@@ -177,6 +189,10 @@ public class TelephonyHooks {
                     new XC_MethodHook() {
                         @Override
                         protected void afterHookedMethod(MethodHookParam param) {
+                            if (param.args.length > 0 && param.args[0] instanceof Integer) {
+                                int idx = (Integer) param.args[0];
+                                if (idx > 1) return;
+                            }
                             if (!ConfigManager.shouldExposeTelephony()) {
                                 param.setResult(null);
                                 return;
@@ -213,6 +229,10 @@ public class TelephonyHooks {
                     new XC_MethodHook() {
                         @Override
                         protected void afterHookedMethod(MethodHookParam param) {
+                            if (param.args.length > 0 && param.args[0] instanceof Integer) {
+                                int idx = (Integer) param.args[0];
+                                if (idx > 1) return;
+                            }
                             if (!ConfigManager.shouldExposeTelephony()) {
                                 param.setResult(null);
                                 return;
@@ -249,6 +269,10 @@ public class TelephonyHooks {
                     new XC_MethodHook() {
                         @Override
                         protected void beforeHookedMethod(MethodHookParam param) {
+                            if (param.args.length > 0 && param.args[0] instanceof Integer) {
+                                int idx = (Integer) param.args[0];
+                                if (idx > 1) return;
+                            }
                             String spoofedValue = ConfigManager.getPhoneNumber();
                             if (spoofedValue != null) {
                                 param.setResult(spoofedValue);
@@ -301,6 +325,10 @@ public class TelephonyHooks {
                     new XC_MethodHook() {
                         @Override
                         protected void beforeHookedMethod(MethodHookParam param) {
+                            if (param.args.length > 0 && param.args[0] instanceof Integer) {
+                                int idx = (Integer) param.args[0];
+                                if (idx > 1) return;
+                            }
                             if (!ConfigManager.shouldExposeTelephony()) {
                                 param.setResult(false);
                                 return;
@@ -335,6 +363,10 @@ public class TelephonyHooks {
                     new XC_MethodHook() {
                         @Override
                         protected void beforeHookedMethod(MethodHookParam param) {
+                            if (param.args.length > 0 && param.args[0] instanceof Integer) {
+                                int idx = (Integer) param.args[0];
+                                if (idx > 1) return;
+                            }
                             if (!ConfigManager.shouldExposeTelephony()) {
                                 param.setResult(TelephonyManager.SIM_STATE_ABSENT);
                                 return;
@@ -450,6 +482,10 @@ public class TelephonyHooks {
                     new XC_MethodHook() {
                         @Override
                         protected void afterHookedMethod(MethodHookParam param) {
+                            if (param.args.length > 0 && param.args[0] instanceof Integer) {
+                                int idx = (Integer) param.args[0];
+                                if (idx > 1) return;
+                            }
                             if (!ConfigManager.shouldExposeTelephony() || !ConfigManager.shouldReportSimPresent()) {
                                 return;
                             }
@@ -512,84 +548,387 @@ public class TelephonyHooks {
                     new XC_MethodHook() {
                         @Override
                         protected void afterHookedMethod(MethodHookParam param) {
-                            String mccMnc = ConfigManager.getSystemProperty("gsm.operator.numeric", null);
-                            if (mccMnc != null) {
-                                param.setResult(mccMnc);
+                            if (ConfigManager.shouldExposeTelephony()) {
+                                param.setResult(ConfigManager.getSystemProperty("gsm.operator.numeric", "310260"));
                             }
                         }
                     });
-        } catch (NoSuchMethodError ignored) {
-        }
+        } catch (NoSuchMethodError ignored) {}
+
+        try {
+            XposedHelpers.findAndHookMethod(telephonyManager, "getNetworkOperator", int.class,
+                    new XC_MethodHook() {
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) {
+                            if (param.args.length > 0 && param.args[0] instanceof Integer) {
+                                int idx = (Integer) param.args[0];
+                                if (idx > 1) return;
+                            }
+                            if (ConfigManager.shouldExposeTelephony()) {
+                                param.setResult(ConfigManager.getSystemProperty("gsm.operator.numeric", "310260"));
+                            }
+                        }
+                    });
+        } catch (NoSuchMethodError ignored) {}
 
         try {
             XposedHelpers.findAndHookMethod(telephonyManager, "getNetworkOperatorName",
                     new XC_MethodHook() {
                         @Override
                         protected void afterHookedMethod(MethodHookParam param) {
-                            String operatorName = ConfigManager.getSystemProperty("gsm.operator.alpha", null);
-                            if (operatorName != null) {
-                                param.setResult(operatorName);
+                            if (ConfigManager.shouldExposeTelephony()) {
+                                param.setResult(ConfigManager.getSystemProperty("gsm.operator.alpha", "T-Mobile"));
                             }
                         }
                     });
-        } catch (NoSuchMethodError ignored) {
-        }
+        } catch (NoSuchMethodError ignored) {}
+
+        try {
+            XposedHelpers.findAndHookMethod(telephonyManager, "getNetworkOperatorName", int.class,
+                    new XC_MethodHook() {
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) {
+                            if (param.args.length > 0 && param.args[0] instanceof Integer) {
+                                int idx = (Integer) param.args[0];
+                                if (idx > 1) return;
+                            }
+                            if (ConfigManager.shouldExposeTelephony()) {
+                                param.setResult(ConfigManager.getSystemProperty("gsm.operator.alpha", "T-Mobile"));
+                            }
+                        }
+                    });
+        } catch (NoSuchMethodError ignored) {}
 
         try {
             XposedHelpers.findAndHookMethod(telephonyManager, "getSimOperator",
                     new XC_MethodHook() {
                         @Override
                         protected void afterHookedMethod(MethodHookParam param) {
-                            String simMccMnc = ConfigManager.getSystemProperty("gsm.sim.operator.numeric", null);
-                            if (simMccMnc != null) {
-                                param.setResult(simMccMnc);
+                            if (ConfigManager.shouldExposeTelephony()) {
+                                param.setResult(ConfigManager.getSystemProperty("gsm.sim.operator.numeric", "310260"));
                             }
                         }
                     });
-        } catch (NoSuchMethodError ignored) {
-        }
+        } catch (NoSuchMethodError ignored) {}
+
+        try {
+            XposedHelpers.findAndHookMethod(telephonyManager, "getSimOperator", int.class,
+                    new XC_MethodHook() {
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) {
+                            if (param.args.length > 0 && param.args[0] instanceof Integer) {
+                                int idx = (Integer) param.args[0];
+                                if (idx > 1) return;
+                            }
+                            if (ConfigManager.shouldExposeTelephony()) {
+                                param.setResult(ConfigManager.getSystemProperty("gsm.sim.operator.numeric", "310260"));
+                            }
+                        }
+                    });
+        } catch (NoSuchMethodError ignored) {}
 
         try {
             XposedHelpers.findAndHookMethod(telephonyManager, "getSimOperatorName",
                     new XC_MethodHook() {
                         @Override
                         protected void afterHookedMethod(MethodHookParam param) {
-                            String simOperatorName = ConfigManager.getSystemProperty("gsm.sim.operator.alpha", null);
-                            if (simOperatorName != null) {
-                                param.setResult(simOperatorName);
+                            if (ConfigManager.shouldExposeTelephony()) {
+                                param.setResult(ConfigManager.getSystemProperty("gsm.sim.operator.alpha", "T-Mobile"));
                             }
                         }
                     });
-        } catch (NoSuchMethodError ignored) {
-        }
+        } catch (NoSuchMethodError ignored) {}
+
+        try {
+            XposedHelpers.findAndHookMethod(telephonyManager, "getSimOperatorName", int.class,
+                    new XC_MethodHook() {
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) {
+                            if (param.args.length > 0 && param.args[0] instanceof Integer) {
+                                int idx = (Integer) param.args[0];
+                                if (idx > 1) return;
+                            }
+                            if (ConfigManager.shouldExposeTelephony()) {
+                                param.setResult(ConfigManager.getSystemProperty("gsm.sim.operator.alpha", "T-Mobile"));
+                            }
+                        }
+                    });
+        } catch (NoSuchMethodError ignored) {}
 
         try {
             XposedHelpers.findAndHookMethod(telephonyManager, "getSimCountryIso",
                     new XC_MethodHook() {
                         @Override
                         protected void afterHookedMethod(MethodHookParam param) {
-                            String simCountry = ConfigManager.getSystemProperty("gsm.sim.operator.iso-country", null);
-                            if (simCountry != null) {
-                                param.setResult(simCountry);
+                            if (ConfigManager.shouldExposeTelephony()) {
+                                param.setResult(ConfigManager.getSystemProperty("gsm.sim.operator.iso-country", "us"));
                             }
                         }
                     });
-        } catch (NoSuchMethodError ignored) {
-        }
+        } catch (NoSuchMethodError ignored) {}
+
+        try {
+            XposedHelpers.findAndHookMethod(telephonyManager, "getSimCountryIso", int.class,
+                    new XC_MethodHook() {
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) {
+                            if (param.args.length > 0 && param.args[0] instanceof Integer) {
+                                int idx = (Integer) param.args[0];
+                                if (idx > 1) return;
+                            }
+                            if (ConfigManager.shouldExposeTelephony()) {
+                                param.setResult(ConfigManager.getSystemProperty("gsm.sim.operator.iso-country", "us"));
+                            }
+                        }
+                    });
+        } catch (NoSuchMethodError ignored) {}
 
         try {
             XposedHelpers.findAndHookMethod(telephonyManager, "getNetworkCountryIso",
                     new XC_MethodHook() {
                         @Override
                         protected void afterHookedMethod(MethodHookParam param) {
-                            String networkCountry = ConfigManager.getSystemProperty("gsm.operator.iso-country", null);
-                            if (networkCountry != null) {
-                                param.setResult(networkCountry);
+                            if (ConfigManager.shouldExposeTelephony()) {
+                                param.setResult(ConfigManager.getSystemProperty("gsm.sim.operator.iso-country", "us"));
                             }
                         }
                     });
-        } catch (NoSuchMethodError ignored) {
-        }
+        } catch (NoSuchMethodError ignored) {}
+
+        try {
+            XposedHelpers.findAndHookMethod(telephonyManager, "getNetworkCountryIso", int.class,
+                    new XC_MethodHook() {
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) {
+                            if (param.args.length > 0 && param.args[0] instanceof Integer) {
+                                int idx = (Integer) param.args[0];
+                                if (idx > 1) return;
+                            }
+                            if (ConfigManager.shouldExposeTelephony()) {
+                                param.setResult(ConfigManager.getSystemProperty("gsm.sim.operator.iso-country", "us"));
+                            }
+                        }
+                    });
+        } catch (NoSuchMethodError ignored) {}
+
+        try {
+            XposedHelpers.findAndHookMethod(telephonyManager, "getSimCarrierIdName",
+                    new XC_MethodHook() {
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) {
+                            if (ConfigManager.shouldExposeTelephony()) {
+                                param.setResult(ConfigManager.getSystemProperty("gsm.sim.operator.alpha", "T-Mobile"));
+                            }
+                        }
+                    });
+        } catch (NoSuchMethodError ignored) {}
+
+        try {
+            XposedHelpers.findAndHookMethod(telephonyManager, "getSimCarrierIdName", int.class,
+                    new XC_MethodHook() {
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) {
+                            if (param.args.length > 0 && param.args[0] instanceof Integer) {
+                                int idx = (Integer) param.args[0];
+                                if (idx > 1) return;
+                            }
+                            if (ConfigManager.shouldExposeTelephony()) {
+                                param.setResult(ConfigManager.getSystemProperty("gsm.sim.operator.alpha", "T-Mobile"));
+                            }
+                        }
+                    });
+        } catch (NoSuchMethodError ignored) {}
+
+        try {
+            XposedHelpers.findAndHookMethod(telephonyManager, "getSimSpecificCarrierIdName",
+                    new XC_MethodHook() {
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) {
+                            if (ConfigManager.shouldExposeTelephony()) {
+                                param.setResult(ConfigManager.getSystemProperty("gsm.sim.operator.alpha", "T-Mobile"));
+                            }
+                        }
+                    });
+        } catch (NoSuchMethodError ignored) {}
+
+        try {
+            XposedHelpers.findAndHookMethod(telephonyManager, "getSimSpecificCarrierIdName", int.class,
+                    new XC_MethodHook() {
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) {
+                            if (param.args.length > 0 && param.args[0] instanceof Integer) {
+                                int idx = (Integer) param.args[0];
+                                if (idx > 1) return;
+                            }
+                            if (ConfigManager.shouldExposeTelephony()) {
+                                param.setResult(ConfigManager.getSystemProperty("gsm.sim.operator.alpha", "T-Mobile"));
+                            }
+                        }
+                    });
+        } catch (NoSuchMethodError ignored) {}
+
+        try {
+            XposedHelpers.findAndHookMethod(telephonyManager, "getSimCarrierId",
+                    new XC_MethodHook() {
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) {
+                            if (ConfigManager.shouldExposeTelephony()) {
+                                try { param.setResult(Integer.parseInt(ConfigManager.getSystemProperty("gsm.sim.carrier.id", "-1"))); } catch (Exception e) { param.setResult(-1); }
+                            }
+                        }
+                    });
+        } catch (NoSuchMethodError ignored) {}
+
+        try {
+            XposedHelpers.findAndHookMethod(telephonyManager, "getSimCarrierId", int.class,
+                    new XC_MethodHook() {
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) {
+                            if (param.args.length > 0 && param.args[0] instanceof Integer) {
+                                int idx = (Integer) param.args[0];
+                                if (idx > 1) return;
+                            }
+                            if (ConfigManager.shouldExposeTelephony()) {
+                                try { param.setResult(Integer.parseInt(ConfigManager.getSystemProperty("gsm.sim.carrier.id", "-1"))); } catch (Exception e) { param.setResult(-1); }
+                            }
+                        }
+                    });
+        } catch (NoSuchMethodError ignored) {}
+
+        try {
+            XposedHelpers.findAndHookMethod(telephonyManager, "getSimSpecificCarrierId",
+                    new XC_MethodHook() {
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) {
+                            if (ConfigManager.shouldExposeTelephony()) {
+                                try { param.setResult(Integer.parseInt(ConfigManager.getSystemProperty("gsm.sim.carrier.id", "-1"))); } catch (Exception e) { param.setResult(-1); }
+                            }
+                        }
+                    });
+        } catch (NoSuchMethodError ignored) {}
+
+        try {
+            XposedHelpers.findAndHookMethod(telephonyManager, "getSimSpecificCarrierId", int.class,
+                    new XC_MethodHook() {
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) {
+                            if (param.args.length > 0 && param.args[0] instanceof Integer) {
+                                int idx = (Integer) param.args[0];
+                                if (idx > 1) return;
+                            }
+                            if (ConfigManager.shouldExposeTelephony()) {
+                                try { param.setResult(Integer.parseInt(ConfigManager.getSystemProperty("gsm.sim.carrier.id", "-1"))); } catch (Exception e) { param.setResult(-1); }
+                            }
+                        }
+                    });
+        } catch (NoSuchMethodError ignored) {}
+
+        try {
+            XposedHelpers.findAndHookMethod(telephonyManager, "getManufacturerCode",
+                    new XC_MethodHook() {
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) {
+                            if (!ConfigManager.shouldExposeTelephony()) {
+                                param.setResult(null);
+                                return;
+                            }
+                            param.setResult(null);
+                        }
+                    });
+        } catch (NoSuchMethodError ignored) {}
+
+        try {
+            XposedHelpers.findAndHookMethod(telephonyManager, "getManufacturerCode", int.class,
+                    new XC_MethodHook() {
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) {
+                            if (param.args.length > 0 && param.args[0] instanceof Integer) {
+                                int idx = (Integer) param.args[0];
+                                if (idx > 1) return;
+                            }
+                            if (!ConfigManager.shouldExposeTelephony()) {
+                                param.setResult(null);
+                                return;
+                            }
+                            param.setResult(null);
+                        }
+                    });
+        } catch (NoSuchMethodError ignored) {}
+
+        try {
+            XposedHelpers.findAndHookMethod(telephonyManager, "getTypeAllocationCode",
+                    new XC_MethodHook() {
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) {
+                            if (!ConfigManager.shouldExposeTelephony()) {
+                                param.setResult(null);
+                                return;
+                            }
+                            String imei = ConfigManager.getIMEI();
+                            if (imei != null && imei.length() >= 8) {
+                                param.setResult(imei.substring(0, 8));
+                            } else {
+                                param.setResult(null);
+                            }
+                        }
+                    });
+        } catch (NoSuchMethodError ignored) {}
+
+        try {
+            XposedHelpers.findAndHookMethod(telephonyManager, "getTypeAllocationCode", int.class,
+                    new XC_MethodHook() {
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) {
+                            if (param.args.length > 0 && param.args[0] instanceof Integer) {
+                                int idx = (Integer) param.args[0];
+                                if (idx > 1) return;
+                            }
+                            if (!ConfigManager.shouldExposeTelephony()) {
+                                param.setResult(null);
+                                return;
+                            }
+                            String imei = ConfigManager.getIMEI();
+                            if (imei != null && imei.length() >= 8) {
+                                param.setResult(imei.substring(0, 8));
+                            } else {
+                                param.setResult(null);
+                            }
+                        }
+                    });
+        } catch (NoSuchMethodError ignored) {}
+
+        try {
+            XposedHelpers.findAndHookMethod(telephonyManager, "getAllCellInfo", new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) {
+                    if (ConfigManager.shouldExposeTelephony()) {
+                        param.setResult(null); // Return null or empty list to hide real cell towers
+                    }
+                }
+            });
+        } catch (NoSuchMethodError ignored) {}
+
+        try {
+            XposedHelpers.findAndHookMethod(telephonyManager, "getCellLocation", new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) {
+                    if (ConfigManager.shouldExposeTelephony()) {
+                        param.setResult(null); // Hide cell location
+                    }
+                }
+            });
+        } catch (NoSuchMethodError ignored) {}
+
+        try {
+            XposedHelpers.findAndHookMethod(telephonyManager, "getNeighboringCellInfo", new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) {
+                    if (ConfigManager.shouldExposeTelephony()) {
+                        param.setResult(null);
+                    }
+                }
+            });
+        } catch (NoSuchMethodError ignored) {}
 
         try {
             XposedHelpers.findAndHookMethod(telephonyManager, "getVoiceMailNumber",
@@ -692,6 +1031,10 @@ public class TelephonyHooks {
                     new XC_MethodHook() {
                         @Override
                         protected void beforeHookedMethod(MethodHookParam param) {
+                            if (param.args.length > 0 && param.args[0] instanceof Integer) {
+                                int idx = (Integer) param.args[0];
+                                if (idx > 1) return;
+                            }
                             if (!ConfigManager.shouldExposeTelephony()) {
                                 param.setResult(null);
                                 return;
@@ -710,6 +1053,10 @@ public class TelephonyHooks {
                     new XC_MethodHook() {
                         @Override
                         protected void beforeHookedMethod(MethodHookParam param) {
+                            if (param.args.length > 0 && param.args[0] instanceof Integer) {
+                                int idx = (Integer) param.args[0];
+                                if (idx > 1) return;
+                            }
                             int slotIndex = param.args[0] instanceof Integer ? (Integer) param.args[0] : 0;
                             if (!ConfigManager.shouldExposeTelephony()) {
                                 param.setResult(null);
@@ -767,6 +1114,10 @@ public class TelephonyHooks {
                     new XC_MethodHook() {
                         @Override
                         protected void beforeHookedMethod(MethodHookParam param) {
+                            if (param.args.length > 0 && param.args[0] instanceof Integer) {
+                                int idx = (Integer) param.args[0];
+                                if (idx > 1) return;
+                            }
                             int slotIndex = param.args[0] instanceof Integer ? (Integer) param.args[0] : 0;
                             if (ConfigManager.shouldExposeTelephony() && ConfigManager.shouldReportSimPresent()) {
                                 param.setResult(slotIndex == SYNTHETIC_SIM_SLOT_INDEX
@@ -784,6 +1135,10 @@ public class TelephonyHooks {
                     new XC_MethodHook() {
                         @Override
                         protected void afterHookedMethod(MethodHookParam param) {
+                            if (param.args.length > 0 && param.args[0] instanceof Integer) {
+                                int idx = (Integer) param.args[0];
+                                if (idx > 1) return;
+                            }
                             if (ConfigManager.shouldExposeTelephony() && ConfigManager.shouldReportSimPresent()) {
                                 param.setResult(SYNTHETIC_SIM_SLOT_INDEX);
                             }
@@ -798,6 +1153,10 @@ public class TelephonyHooks {
                     new XC_MethodHook() {
                         @Override
                         protected void beforeHookedMethod(MethodHookParam param) {
+                            if (param.args.length > 0 && param.args[0] instanceof Integer) {
+                                int idx = (Integer) param.args[0];
+                                if (idx > 1) return;
+                            }
                             int slotIndex = param.args[0] instanceof Integer ? (Integer) param.args[0] : 0;
                             if (!ConfigManager.shouldExposeTelephony()) {
                                 param.setResult(new int[0]);
@@ -819,6 +1178,10 @@ public class TelephonyHooks {
                     new XC_MethodHook() {
                         @Override
                         protected void afterHookedMethod(MethodHookParam param) {
+                            if (param.args.length > 0 && param.args[0] instanceof Integer) {
+                                int idx = (Integer) param.args[0];
+                                if (idx > 1) return;
+                            }
                             if (!ConfigManager.shouldExposeTelephony()) {
                                 param.setResult(false);
                                 return;
@@ -837,6 +1200,10 @@ public class TelephonyHooks {
                     new XC_MethodHook() {
                         @Override
                         protected void afterHookedMethod(MethodHookParam param) {
+                            if (param.args.length > 0 && param.args[0] instanceof Integer) {
+                                int idx = (Integer) param.args[0];
+                                if (idx > 1) return;
+                            }
                             if (ConfigManager.shouldExposeTelephony() && ConfigManager.shouldReportSimPresent()) {
                                 param.setResult(true);
                             }
@@ -851,6 +1218,10 @@ public class TelephonyHooks {
                     new XC_MethodHook() {
                         @Override
                         protected void afterHookedMethod(MethodHookParam param) {
+                            if (param.args.length > 0 && param.args[0] instanceof Integer) {
+                                int idx = (Integer) param.args[0];
+                                if (idx > 1) return;
+                            }
                             if (ConfigManager.shouldExposeTelephony() && ConfigManager.shouldReportSimPresent()) {
                                 param.setResult(true);
                             }
@@ -881,27 +1252,22 @@ public class TelephonyHooks {
     private static void hookSubscriptionInfo(Class<?> subscriptionInfoClass) {
         hookSubscriptionInfoGetter(subscriptionInfoClass, "getSubscriptionId", () -> SYNTHETIC_SUBSCRIPTION_ID);
         hookSubscriptionInfoGetter(subscriptionInfoClass, "getSimSlotIndex", () -> SYNTHETIC_SIM_SLOT_INDEX);
-        hookSubscriptionInfoGetter(subscriptionInfoClass, "getCarrierId", () -> 0);
-        hookSubscriptionInfoGetter(subscriptionInfoClass, "getDisplayName", () -> firstNonBlank(
-                ConfigManager.getSystemProperty("gsm.sim.operator.alpha", null),
-                ConfigManager.getSystemProperty("gsm.operator.alpha", null),
-                "SIM 1"
-        ));
-        hookSubscriptionInfoGetter(subscriptionInfoClass, "getCarrierName", () -> firstNonBlank(
-                ConfigManager.getSystemProperty("gsm.sim.operator.alpha", null),
-                ConfigManager.getSystemProperty("gsm.operator.alpha", null),
-                "Carrier"
-        ));
+        hookSubscriptionInfoGetter(subscriptionInfoClass, "getCarrierId", () -> {
+            try {
+                return Integer.parseInt(ConfigManager.getSystemProperty("gsm.sim.carrier.id", "-1"));
+            } catch (Exception e) {
+                return -1;
+            }
+        });
+        hookSubscriptionInfoGetter(subscriptionInfoClass, "getDisplayName", () -> ConfigManager.getSystemProperty("gsm.sim.operator.alpha", "T-Mobile"));
+        hookSubscriptionInfoGetter(subscriptionInfoClass, "getCarrierName", () -> ConfigManager.getSystemProperty("gsm.sim.operator.alpha", "T-Mobile"));
         hookSubscriptionInfoGetter(subscriptionInfoClass, "getNumber", () -> firstNonBlank(ConfigManager.getPhoneNumber(), ""));
         hookSubscriptionInfoGetter(subscriptionInfoClass, "getDataRoaming", () -> 0);
         hookSubscriptionInfoGetter(subscriptionInfoClass, "getMcc", TelephonyHooks::parseMcc);
         hookSubscriptionInfoGetter(subscriptionInfoClass, "getMnc", TelephonyHooks::parseMnc);
         hookSubscriptionInfoGetter(subscriptionInfoClass, "getMccString", TelephonyHooks::parseMccString);
         hookSubscriptionInfoGetter(subscriptionInfoClass, "getMncString", TelephonyHooks::parseMncString);
-        hookSubscriptionInfoGetter(subscriptionInfoClass, "getCountryIso", () -> firstNonBlank(
-                ConfigManager.getSystemProperty("gsm.sim.operator.iso-country", null),
-                "us"
-        ));
+        hookSubscriptionInfoGetter(subscriptionInfoClass, "getCountryIso", () -> ConfigManager.getSystemProperty("gsm.sim.operator.iso-country", "us"));
         hookSubscriptionInfoGetter(subscriptionInfoClass, "isEmbedded", () -> false);
         hookSubscriptionInfoGetter(subscriptionInfoClass, "isOpportunistic", () -> false);
         hookSubscriptionInfoGetter(subscriptionInfoClass, "getSubscriptionType", () -> 0);
