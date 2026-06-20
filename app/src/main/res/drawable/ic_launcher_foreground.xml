@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<vector
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108"
+>
+
+    <group
+        android:translateX="18"
+        android:translateY="18"
+        android:scaleX="3"
+        android:scaleY="3"
+    >
+
+        <!-- Shield Left -->
+        <path
+            android:fillColor="#0F4A45"
+            android:pathData="M12,1 L3,5 v6 c0,5.55 3.84,10.74 9,12 z"
+        />
+
+        <!-- Shield Right -->
+        <path
+            android:fillColor="#14635C"
+            android:pathData="M12,1 L21,5 v6 c0,5.55 -3.84,10.74 -9,12 z"
+        />
+
+        <!-- Hat Top -->
+        <path
+            android:fillColor="#1A1C1B"
+            android:pathData="M7,11.5 L8.5,5.5 H15.5 L17,11.5 Z"
+        />
+
+        <!-- Hat Band -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M7.3,10 L16.7,10 L17,11.2 L7,11.2 Z"
+        />
+
+        <!-- Hat Brim -->
+        <path
+            android:fillColor="#1A1C1B"
+            android:pathData="M4,13 c0,0 3,-2 8,-2 c5,0 8,2 8,2 s-3,-1 -8,-1 c-5,0 -8,1 -8,1 z"
+        />
+
+        <!-- Mask -->
+        <path
+            android:fillColor="#1A1C1B"
+            android:pathData="M4.5,15 c0,-1.5 2.5,-2 7.5,-1 c5,-1 7.5,-0.5 7.5,1 c0,2 -3.5,2 -7.5,1 c-4,1 -7.5,1 -7.5,-1 z"
+        />
+
+        <!-- Eyes -->
+        <path
+            android:fillColor="#B8E8DF"
+            android:pathData="M6.5,15 c1,-0.8 2,-0.8 3,0 c-1,0.8 -2,0.8 -3,0 z M14.5,15 c1,-0.8 2,-0.8 3,0 c-1,0.8 -2,0.8 -3,0 z"
+        />
+
+    </group>
+</vector>

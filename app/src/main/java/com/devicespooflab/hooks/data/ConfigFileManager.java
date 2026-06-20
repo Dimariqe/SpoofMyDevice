@@ -30,6 +30,9 @@ public class ConfigFileManager {
     public static final String MIRROR_PREFS_NAME = "module_config_mirror";
     public static final String MIRROR_PREFS_KEY_CONTENT = "content";
     private static final String META_PREFIX = "# meta.";
+    public static final String META_APP_PREFIX = "# meta.app.";
+    public static final String META_PROFILE_BEGIN_PREFIX = "# meta.profile.begin=";
+    public static final String META_PROFILE_END_PREFIX = "# meta.profile.end=";
     private static final List<String> PARTITIONS = Arrays.asList(
         "product",
         "system",
@@ -65,9 +68,21 @@ public class ConfigFileManager {
         try (BufferedReader reader = new BufferedReader(new FileReader(configFile))) {
             String line;
             StringBuilder rawContent = new StringBuilder();
+            boolean insideProfileBlock = false;
             while ((line = reader.readLine()) != null) {
                 rawContent.append(line).append('\n');
                 String trimmed = line.trim();
+                if (trimmed.startsWith(META_PROFILE_BEGIN_PREFIX)) {
+                    insideProfileBlock = true;
+                    continue;
+                }
+                if (trimmed.startsWith(META_PROFILE_END_PREFIX)) {
+                    insideProfileBlock = false;
+                    continue;
+                }
+                if (insideProfileBlock || trimmed.startsWith(META_APP_PREFIX)) {
+                    continue;
+                }
                 if (trimmed.startsWith(META_PREFIX)) {
                     int index = trimmed.indexOf('=');
                     if (index > 0) {
@@ -142,6 +157,124 @@ public class ConfigFileManager {
         builder.append("# meta.preset_id=").append(selectedPresetId == null ? "" : selectedPresetId).append('\n');
         builder.append("# meta.mode=").append(customMode ? "custom" : "preset").append("\n\n");
 
+        appendDeviceProperties(builder, profile, extraProperties);
+        appendProfileBlocks(builder, context);
+
+        try (FileOutputStream outputStream = new FileOutputStream(configFile, false)) {
+            outputStream.write(builder.toString().getBytes(StandardCharsets.UTF_8));
+        }
+        makeConfigReadable(context, configFile);
+        writePublicMirror(builder.toString());
+        writeRootMirror(configFile);
+        mirrorForXposed(context, builder.toString());
+        grantConfigUriReadAccess(context);
+
+        Map<String, String> preserved = extraProperties == null
+            ? new LinkedHashMap<String, String>()
+            : new LinkedHashMap<>(extraProperties);
+        return new LoadedConfig(configFile, profile, preserved, selectedPresetId, customMode);
+    }
+
+    public String buildDeviceProfileBlock(DeviceProfile draftProfile) {
+        DeviceProfile profile = draftProfile.copy();
+        profile.applyFallbacks();
+        StringBuilder builder = new StringBuilder();
+        appendDeviceProperties(builder, profile, new LinkedHashMap<String, String>());
+        return builder.toString();
+    }
+
+    public String buildProfileBlock(DeviceProfile draftProfile, Map<String, String> extraProperties) {
+        DeviceProfile profile = draftProfile.copy();
+        profile.applyFallbacks();
+        Map<String, String> filteredExtras = new LinkedHashMap<>();
+        if (extraProperties != null) {
+            for (Map.Entry<String, String> entry : extraProperties.entrySet()) {
+                String key = entry.getKey();
+                if (!key.startsWith("safe_mode.")
+                        && !"device.apply_screen_metrics".equals(key)
+                        && !"device.hook_wifi".equals(key)
+                        && !"device.hook_location".equals(key)) {
+                    filteredExtras.put(key, entry.getValue());
+                }
+            }
+        }
+        StringBuilder builder = new StringBuilder();
+        appendDeviceProperties(builder, profile, filteredExtras);
+        return builder.toString();
+    }
+
+    public DeviceProfile parseDeviceProfile(String propertiesText) {
+        return mergeProfile(new DeviceProfile(), parsePropertiesText(propertiesText));
+    }
+
+    public Map<String, String> parseExtraProperties(String propertiesText) {
+        Map<String, String> all = parsePropertiesText(propertiesText);
+        Map<String, String> extras = new LinkedHashMap<>(all);
+        for (String key : MANAGED_KEYS) {
+            extras.remove(key);
+        }
+        return extras;
+    }
+
+    public String matchPresetId(DeviceProfile profile, List<DevicePreset> presets) {
+        return findMatchingPresetId(profile, presets);
+    }
+
+    private Map<String, String> parsePropertiesText(String propertiesText) {
+        Map<String, String> properties = new LinkedHashMap<>();
+        if (propertiesText == null || propertiesText.isEmpty()) {
+            return properties;
+        }
+        for (String line : propertiesText.split("\n")) {
+            String trimmed = line.trim();
+            if (trimmed.isEmpty() || trimmed.startsWith("#")) {
+                continue;
+            }
+            int eq = trimmed.indexOf('=');
+            if (eq > 0) {
+                properties.put(trimmed.substring(0, eq).trim(), trimmed.substring(eq + 1).trim());
+            }
+        }
+        return properties;
+    }
+
+    private void appendProfileBlocks(StringBuilder builder, Context context) {
+        List<SpoofProfile> profiles = ProfileStore.load(context);
+        if (profiles.isEmpty()) {
+            return;
+        }
+        boolean wroteHeader = false;
+        for (SpoofProfile profile : profiles) {
+            for (String packageName : profile.getApps()) {
+                if (packageName == null || packageName.trim().isEmpty()) {
+                    continue;
+                }
+                if (!wroteHeader) {
+                    builder.append("\n# === SpoofMyDevice per-app profiles ===\n");
+                    wroteHeader = true;
+                }
+                builder.append(META_APP_PREFIX)
+                    .append(packageName.trim())
+                    .append('=')
+                    .append(profile.getId())
+                    .append('\n');
+            }
+        }
+        for (SpoofProfile profile : profiles) {
+            if (profile.getApps().isEmpty()) {
+                continue;
+            }
+            String propertiesText = profile.getPropertiesText() == null ? "" : profile.getPropertiesText();
+            builder.append('\n').append(META_PROFILE_BEGIN_PREFIX).append(profile.getId()).append('\n');
+            builder.append(propertiesText);
+            if (!propertiesText.endsWith("\n")) {
+                builder.append('\n');
+            }
+            builder.append(META_PROFILE_END_PREFIX).append(profile.getId()).append('\n');
+        }
+    }
+
+    private void appendDeviceProperties(StringBuilder builder, DeviceProfile profile, Map<String, String> extraProperties) {
         builder.append("# Device Identity\n");
         append(builder, "device.form_factor", profile.getBuildCharacteristics().contains("tablet") ? "tablet" : "phone");
         append(builder, "device.has_telephony", profile.getBuildCharacteristics().contains("tablet") ? "false" : "true");
@@ -279,20 +412,6 @@ public class ConfigFileManager {
                 }
             }
         }
-
-        try (FileOutputStream outputStream = new FileOutputStream(configFile, false)) {
-            outputStream.write(builder.toString().getBytes(StandardCharsets.UTF_8));
-        }
-        makeConfigReadable(context, configFile);
-        writePublicMirror(builder.toString());
-        writeRootMirror(configFile);
-        mirrorForXposed(context, builder.toString());
-        grantConfigUriReadAccess(context);
-
-        Map<String, String> preserved = extraProperties == null
-            ? new LinkedHashMap<String, String>()
-            : new LinkedHashMap<>(extraProperties);
-        return new LoadedConfig(configFile, profile, preserved, selectedPresetId, customMode);
     }
 
     public File getConfigFile(Context context) {

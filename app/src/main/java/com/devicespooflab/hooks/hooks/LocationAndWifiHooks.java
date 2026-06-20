@@ -23,18 +23,13 @@ public class LocationAndWifiHooks {
         Class<?> wifiManager = XposedHelpers.findClassIfExists("android.net.wifi.WifiManager", lpparam.classLoader);
         if (wifiManager != null) {
             try {
-                // Prevent Wi-Fi triangulation by returning empty scan results
                 XposedHelpers.findAndHookMethod(wifiManager, "getScanResults", new XC_MethodHook() {
                     @Override
                     protected void afterHookedMethod(MethodHookParam param) {
+                        if (!ConfigManager.shouldHookWifi()) return;
                         param.setResult(new ArrayList<ScanResult>());
                     }
                 });
-            } catch (Throwable ignored) {}
-
-            try {
-                // Optional: we can also hide current Wi-Fi connection info if needed, but returning null might crash some apps.
-                // We'll leave it out for now or spoof MAC if requested.
             } catch (Throwable ignored) {}
         }
     }
@@ -46,7 +41,7 @@ public class LocationAndWifiHooks {
                 XposedHelpers.findAndHookMethod(locationManager, "getLastKnownLocation", String.class, new XC_MethodHook() {
                     @Override
                     protected void afterHookedMethod(MethodHookParam param) {
-                        // Return null to act as if location is not available
+                        if (!ConfigManager.shouldHookLocation()) return;
                         param.setResult(null);
                     }
                 });

@@ -50,7 +50,7 @@ public class MainHook implements IXposedHookLoadPackage {
         }
 
         try {
-            ConfigManager.init();
+            ConfigManager.init(lpparam.packageName);
             XposedBridge.log(TAG + ": Config initialized successfully");
         } catch (Exception exception) {
             XposedBridge.log(TAG + ": Failed to init config: " + exception.getMessage());

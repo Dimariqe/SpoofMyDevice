@@ -26,7 +26,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import com.devicespooflab.hooks.MainActivity;
+import com.devicespooflab.hooks.DeviceSettingsHost;
 import com.devicespooflab.hooks.R;
 import com.devicespooflab.hooks.data.ConfigFileManager;
 import com.devicespooflab.hooks.data.DevicePreset;
@@ -38,11 +38,23 @@ import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.net.Authenticator;
+import java.net.InetSocketAddress;
+import java.net.PasswordAuthentication;
+import java.net.Proxy;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.UUID;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import java.security.cert.X509Certificate;
 public class DeviceSettingsFragment extends Fragment {
 
     private static final UUID WIDEVINE_UUID = new UUID(
@@ -81,6 +93,14 @@ public class DeviceSettingsFragment extends Fragment {
         installSpoofToggles();
         setupListeners();
         updateAdvancedSectionState();
+        updateProxySectionVisibility();
+    }
+
+    private void updateProxySectionVisibility() {
+        if (binding == null) return;
+        boolean show = (getActivity() instanceof DeviceSettingsHost)
+            && ((DeviceSettingsHost) getActivity()).isProfileContext();
+        binding.proxySection.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -99,7 +119,7 @@ public class DeviceSettingsFragment extends Fragment {
     }
 
     public void refreshFromHost(boolean force) {
-        if (binding == null || !(requireActivity() instanceof MainActivity)) {
+        if (binding == null || !(requireActivity() instanceof DeviceSettingsHost)) {
             return;
         }
         advancedExpanded = false;
@@ -108,7 +128,7 @@ public class DeviceSettingsFragment extends Fragment {
             return;
         }
 
-        MainActivity activity = (MainActivity) requireActivity();
+        DeviceSettingsHost activity = (DeviceSettingsHost) requireActivity();
         presets.clear();
         presets.addAll(activity.getPresets());
         ConfigFileManager.LoadedConfig loadedConfig = activity.getLoadedConfigState();
@@ -119,6 +139,7 @@ public class DeviceSettingsFragment extends Fragment {
         setupPresetDropdown();
         bindProfile(workingProfile);
         bindAdvancedProperties(loadedConfig.getExtraProperties());
+        bindProxyProperties(loadedConfig.getExtraProperties());
         bindToggleStates(loadedConfig.getExtraProperties());
         populateAdvancedDefaultsIfNeeded();
         applyMode(customMode, false);
@@ -157,6 +178,31 @@ public class DeviceSettingsFragment extends Fragment {
         draft.setSimCountryIso(text(binding.inputSimCountry));
         draft.setTimezone(text(binding.inputTimezone));
         return new Draft(draft, selectedPresetId, customMode, buildExtraProperties());
+    }
+
+    private void bindProxyProperties(Map<String, String> extraProperties) {
+        if (binding == null) return;
+        String enabled = extraProperties.get(ConfigManager.KEY_PROXY_ENABLED);
+        binding.switchProxyEnabled.setChecked("1".equals(enabled) || "true".equalsIgnoreCase(enabled));
+        setText(binding.inputProxyHost, extraProperties.get(ConfigManager.KEY_PROXY_HOST));
+        setText(binding.inputProxyPort, extraProperties.get(ConfigManager.KEY_PROXY_PORT));
+        setText(binding.inputProxyUser, extraProperties.get(ConfigManager.KEY_PROXY_USER));
+        setText(binding.inputProxyPassword, extraProperties.get(ConfigManager.KEY_PROXY_PASSWORD));
+        updateProxyFieldEnablement();
+    }
+
+    private void updateProxyFieldEnablement() {
+        if (binding == null) return;
+        boolean enabled = binding.switchProxyEnabled.isChecked();
+        binding.layoutProxyHost.setEnabled(enabled);
+        binding.layoutProxyPort.setEnabled(enabled);
+        binding.layoutProxyUser.setEnabled(enabled);
+        binding.layoutProxyPassword.setEnabled(enabled);
+        binding.buttonCheckProxy.setEnabled(enabled);
+        binding.inputProxyHost.setEnabled(enabled);
+        binding.inputProxyPort.setEnabled(enabled);
+        binding.inputProxyUser.setEnabled(enabled);
+        binding.inputProxyPassword.setEnabled(enabled);
     }
 
     private void setupListeners() {
@@ -232,6 +278,122 @@ public class DeviceSettingsFragment extends Fragment {
         binding.layoutAdvancedAppSetId.setEndIconOnClickListener(v ->
             setText(binding.inputAdvancedAppSetId, RandomGenerator.generateGAID())
         );
+
+        binding.switchProxyEnabled.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            updateProxyFieldEnablement();
+            updateFieldEnablement();
+        });
+
+        binding.buttonCheckProxy.setOnClickListener(v -> checkProxy());
+    }
+
+    private void checkProxy() {
+        String host = text(binding.inputProxyHost);
+        int port = intValue(binding.inputProxyPort, 1080);
+        String user = text(binding.inputProxyUser);
+        String pass = text(binding.inputProxyPassword);
+
+        if (host.isEmpty()) {
+            binding.textProxyCheckResult.setText(getString(R.string.proxy_failed, "Host is empty"));
+            return;
+        }
+
+        binding.textProxyCheckResult.setText(R.string.proxy_checking);
+        binding.buttonCheckProxy.setEnabled(false);
+
+        new Thread(() -> {
+            try {
+                if (!user.isEmpty()) {
+                    Authenticator.setDefault(new Authenticator() {
+                        @Override
+                        protected PasswordAuthentication getPasswordAuthentication() {
+                            return new PasswordAuthentication(user, pass.toCharArray());
+                        }
+                    });
+                } else {
+                    Authenticator.setDefault(null);
+                }
+
+                InetSocketAddress proxyAddr = InetSocketAddress.createUnresolved(host, port);
+                Proxy proxy = new Proxy(Proxy.Type.SOCKS, proxyAddr);
+                
+                StringBuilder errorLog = new StringBuilder();
+                // Try HTTPS ifconfig.me
+                String result = tryCheckProxySimple(proxy, "https://ifconfig.me/ip", errorLog);
+                if (result == null) {
+                    result = tryCheckProxySimple(proxy, "https://ident.me", errorLog);
+                }
+                
+                if (result == null) {
+                    errorLog.append("\n");
+                    result = tryCheckProxySimple(proxy, "http://ifconfig.me/ip", errorLog);
+                }
+
+                if (result != null) {
+                    updateProxyCheckResult(result);
+                } else {
+                    updateProxyCheckResult(getString(R.string.proxy_failed, errorLog.toString().trim()));
+                }
+            } catch (Exception e) {
+                android.util.Log.e("SpoofMyDevice", "Proxy check thread error", e);
+                updateProxyCheckResult(getString(R.string.proxy_failed, e.getMessage()));
+            }
+        }).start();
+    }
+
+    private String tryCheckProxySimple(Proxy proxy, String urlString, StringBuilder log) {
+        try {
+            URL url = new URL(urlString);
+            java.net.HttpURLConnection connection = (java.net.HttpURLConnection) url.openConnection(proxy);
+            connection.setConnectTimeout(10000);
+            connection.setReadTimeout(10000);
+            
+            if (connection instanceof HttpsURLConnection) {
+                setupTrustAllSSL((HttpsURLConnection) connection);
+            }
+
+            try (Scanner scanner = new Scanner(connection.getInputStream(), StandardCharsets.UTF_8.name())) {
+                String ip = scanner.useDelimiter("\\A").next().trim();
+                if (ip.isEmpty()) return null;
+                return getString(R.string.proxy_success, ip, "Online");
+            }
+        } catch (Exception e) {
+            String msg = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
+            String protocol = urlString.startsWith("https") ? "HTTPS" : "HTTP";
+            log.append(protocol).append(": ").append(msg).append("; ");
+            return null;
+        }
+    }
+
+    private void setupTrustAllSSL(HttpsURLConnection connection) {
+        try {
+            SSLContext sc = SSLContext.getInstance("TLS");
+            sc.init(null, new TrustManager[]{new X509TrustManager() {
+                public X509Certificate[] getAcceptedIssuers() { return null; }
+                public void checkClientTrusted(X509Certificate[] certs, String authType) { }
+                public void checkServerTrusted(X509Certificate[] certs, String authType) { }
+            }}, new java.security.SecureRandom());
+            connection.setSSLSocketFactory(sc.getSocketFactory());
+            connection.setHostnameVerifier((hostname, session) -> true);
+        } catch (Exception ignored) {}
+    }
+
+    private String extractJsonValue(String json, String key) {
+        String pattern = "\"" + key + "\":\\s*\"([^\"]*)\"";
+        java.util.regex.Matcher matcher = java.util.regex.Pattern.compile(pattern).matcher(json);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return "Unknown";
+    }
+
+    private void updateProxyCheckResult(String message) {
+        if (binding == null) return;
+        binding.getRoot().post(() -> {
+            if (binding == null) return;
+            binding.textProxyCheckResult.setText(message);
+            binding.buttonCheckProxy.setEnabled(true);
+        });
     }
 
     private void setupPresetDropdown() {
@@ -349,8 +511,8 @@ public class DeviceSettingsFragment extends Fragment {
 
     private Map<String, String> buildExtraProperties() {
         Map<String, String> extraProperties = new LinkedHashMap<>();
-        if (requireActivity() instanceof MainActivity) {
-            extraProperties.putAll(((MainActivity) requireActivity()).getLoadedConfigState().getExtraProperties());
+        if (requireActivity() instanceof DeviceSettingsHost) {
+            extraProperties.putAll(((DeviceSettingsHost) requireActivity()).getLoadedConfigState().getExtraProperties());
         }
 
         putOptional(extraProperties, ConfigManager.KEY_SPOOF_IMEI, text(binding.inputAdvancedImei));
@@ -362,6 +524,23 @@ public class DeviceSettingsFragment extends Fragment {
         putOptional(extraProperties, ConfigManager.KEY_SPOOF_GSF_ID, text(binding.inputAdvancedGsfId));
         putOptional(extraProperties, ConfigManager.KEY_SPOOF_MEDIA_DRM_ID, text(binding.inputAdvancedMediaDrmId));
         putOptional(extraProperties, ConfigManager.KEY_SPOOF_APP_SET_ID, text(binding.inputAdvancedAppSetId));
+
+        boolean proxyEnabled = binding.switchProxyEnabled.isChecked();
+        String proxyHost = text(binding.inputProxyHost);
+        if (proxyEnabled || !proxyHost.isEmpty()) {
+            extraProperties.put(ConfigManager.KEY_PROXY_ENABLED, proxyEnabled ? "true" : "false");
+            putOptional(extraProperties, ConfigManager.KEY_PROXY_HOST, proxyHost);
+            putOptional(extraProperties, ConfigManager.KEY_PROXY_PORT, text(binding.inputProxyPort));
+            putOptional(extraProperties, ConfigManager.KEY_PROXY_USER, text(binding.inputProxyUser));
+            putOptional(extraProperties, ConfigManager.KEY_PROXY_PASSWORD, text(binding.inputProxyPassword));
+        } else {
+            extraProperties.remove(ConfigManager.KEY_PROXY_ENABLED);
+            extraProperties.remove(ConfigManager.KEY_PROXY_HOST);
+            extraProperties.remove(ConfigManager.KEY_PROXY_PORT);
+            extraProperties.remove(ConfigManager.KEY_PROXY_USER);
+            extraProperties.remove(ConfigManager.KEY_PROXY_PASSWORD);
+        }
+
         for (ToggleBinding toggleBinding : toggleBindings.values()) {
             String key = ConfigManager.getTogglePropertyKey(toggleBinding.fieldId);
             if (toggleBinding.toggle.isChecked()) {
@@ -551,6 +730,8 @@ public class DeviceSettingsFragment extends Fragment {
         applyEditTextState(binding.inputAdvancedGsfId, ConfigManager.FIELD_GSF_ID, false);
         applyEditTextState(binding.inputAdvancedMediaDrmId, ConfigManager.FIELD_MEDIA_DRM_ID, false);
         applyEditTextState(binding.inputAdvancedAppSetId, ConfigManager.FIELD_APP_SET_ID, false);
+
+        updateProxyFieldEnablement();
     }
 
     private void applyEditTextState(TextInputEditText editText, String fieldId, boolean dependsOnCustomMode) {

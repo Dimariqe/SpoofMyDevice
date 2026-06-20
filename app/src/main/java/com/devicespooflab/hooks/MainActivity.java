@@ -11,21 +11,21 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.graphics.ColorUtils;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.devicespooflab.hooks.DeviceSettingsHost;
 import com.devicespooflab.hooks.data.AppSettingsStore;
 import com.devicespooflab.hooks.data.ConfigFileManager;
 import com.devicespooflab.hooks.data.DevicePreset;
 import com.devicespooflab.hooks.data.DevicePresetCatalog;
 import com.devicespooflab.hooks.databinding.ActivityMainBinding;
 import com.devicespooflab.hooks.ui.AppSettingsFragment;
-import com.devicespooflab.hooks.ui.DeviceSettingsFragment;
 import com.devicespooflab.hooks.ui.HomeFragment;
+import com.devicespooflab.hooks.ui.SpoofProfilesFragment;
 import com.devicespooflab.hooks.utils.ConfigManager;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
@@ -39,10 +39,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements DeviceSettingsHost {
 
     private static final String TAG_HOME = "home";
-    private static final String TAG_DEVICE_SETTINGS = "device_settings";
+    private static final String TAG_SPOOF_PROFILES = "spoof_profiles";
     private static final String TAG_APP_SETTINGS = "app_settings";
     private static final String STATE_SELECTED_TAB = "selected_tab";
 
@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private ConfigFileManager.LoadedConfig loadedConfig;
 
     private HomeFragment homeFragment;
-    private DeviceSettingsFragment settingsFragment;
+    private SpoofProfilesFragment spoofProfilesFragment;
     private AppSettingsFragment appSettingsFragment;
     private boolean tabletNavigation;
     private boolean syncingNavigationSelection;
@@ -77,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
 
         setupFragments(savedInstanceState);
         setupBottomNavigation(savedInstanceState);
-        binding.saveFab.setOnClickListener(view -> saveFromEditor());
         refreshRemotePresets(false);
     }
 
@@ -116,7 +115,6 @@ public class MainActivity extends AppCompatActivity {
         binding.bottomNavigation.setVisibility(tabletNavigation ? View.GONE : View.VISIBLE);
         binding.navigationRail.setLabelVisibilityMode(NavigationBarView.LABEL_VISIBILITY_SELECTED);
         binding.bottomNavigation.setLabelVisibilityMode(NavigationBarView.LABEL_VISIBILITY_SELECTED);
-        updateSaveFabPosition();
     }
 
     private void configureNavigationAppearance() {
@@ -144,24 +142,24 @@ public class MainActivity extends AppCompatActivity {
     private void setupFragments(Bundle savedInstanceState) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         homeFragment = (HomeFragment) fragmentManager.findFragmentByTag(TAG_HOME);
-        settingsFragment = (DeviceSettingsFragment) fragmentManager.findFragmentByTag(TAG_DEVICE_SETTINGS);
+        spoofProfilesFragment = (SpoofProfilesFragment) fragmentManager.findFragmentByTag(TAG_SPOOF_PROFILES);
         appSettingsFragment = (AppSettingsFragment) fragmentManager.findFragmentByTag(TAG_APP_SETTINGS);
 
         if (homeFragment == null) {
             homeFragment = new HomeFragment();
-            settingsFragment = new DeviceSettingsFragment();
+            spoofProfilesFragment = new SpoofProfilesFragment();
             appSettingsFragment = new AppSettingsFragment();
 
             fragmentManager.beginTransaction()
                 .add(R.id.fragment_container, homeFragment, TAG_HOME)
-                .add(R.id.fragment_container, settingsFragment, TAG_DEVICE_SETTINGS)
-                .hide(settingsFragment)
+                .add(R.id.fragment_container, spoofProfilesFragment, TAG_SPOOF_PROFILES)
+                .hide(spoofProfilesFragment)
                 .add(R.id.fragment_container, appSettingsFragment, TAG_APP_SETTINGS)
                 .hide(appSettingsFragment)
                 .commitNow();
         }
         applyFragmentHeaderChrome(homeFragment);
-        applyFragmentHeaderChrome(settingsFragment);
+        applyFragmentHeaderChrome(spoofProfilesFragment);
         applyFragmentHeaderChrome(appSettingsFragment);
     }
 
@@ -207,58 +205,36 @@ public class MainActivity extends AppCompatActivity {
 
     private void switchTab(int itemId) {
         Fragment target;
-        boolean showSave;
 
         if (itemId == R.id.navigation_settings) {
-            target = settingsFragment;
-            showSave = true;
-            settingsFragment.refreshFromHost(false);
+            target = spoofProfilesFragment;
+            spoofProfilesFragment.refresh();
         } else if (itemId == R.id.navigation_app_settings) {
             target = appSettingsFragment;
-            showSave = false;
             appSettingsFragment.refreshFromHost();
         } else {
             target = homeFragment;
-            showSave = false;
             homeFragment.refresh();
         }
 
         getSupportFragmentManager().beginTransaction()
             .hide(homeFragment)
-            .hide(settingsFragment)
+            .hide(spoofProfilesFragment)
             .hide(appSettingsFragment)
             .show(target)
             .commitNow();
 
-        binding.saveFab.setVisibility(showSave ? View.VISIBLE : View.GONE);
         applyFragmentHeaderChrome(target);
         binding.fragmentContainer.post(() -> scrollFragmentToTop(target));
     }
 
-    private void saveFromEditor() {
-        DeviceSettingsFragment.Draft draft = settingsFragment.buildDraft();
-        if (draft == null) {
-            return;
-        }
-
+    public void reloadConfig() {
         try {
-            loadedConfig = configFileManager.save(
-                this,
-                draft.profile,
-                draft.extraProperties,
-                draft.selectedPresetId,
-                draft.customMode
-            );
-            settingsFragment.refreshFromHost(true);
-            homeFragment.refresh();
-            appSettingsFragment.refreshFromHost();
-            Snackbar.make(binding.getRoot(), R.string.save_success, Snackbar.LENGTH_LONG)
-                .setAnchorView(binding.saveFab)
-                .show();
-        } catch (Exception exception) {
-            Snackbar.make(binding.getRoot(), getString(R.string.save_failed) + " " + exception.getMessage(), Snackbar.LENGTH_LONG)
-                .setAnchorView(binding.saveFab)
-                .show();
+            loadedConfig = configFileManager.ensureLoaded(this, presets);
+            if (homeFragment != null) {
+                homeFragment.refresh();
+            }
+        } catch (Exception ignored) {
         }
     }
 
@@ -315,7 +291,6 @@ public class MainActivity extends AppCompatActivity {
                 loadedConfig.getSelectedPresetId(),
                 loadedConfig.isCustomMode()
             );
-            settingsFragment.refreshFromHost(true);
             appSettingsFragment.refreshFromHost();
             return true;
         } catch (Exception exception) {
@@ -381,9 +356,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean updateScreenMetricsSpoofEnabled(boolean enabled) {
+        return updateBooleanExtraProperty(ConfigManager.KEY_APPLY_SCREEN_METRICS, enabled);
+    }
+
+    public boolean isWifiHookEnabled() {
+        String value = loadedConfig.getExtraProperties().get(ConfigManager.KEY_HOOK_WIFI);
+        return value == null || "1".equals(value) || "true".equalsIgnoreCase(value);
+    }
+
+    public boolean updateWifiHookEnabled(boolean enabled) {
+        return updateBooleanExtraProperty(ConfigManager.KEY_HOOK_WIFI, enabled);
+    }
+
+    public boolean isLocationHookEnabled() {
+        String value = loadedConfig.getExtraProperties().get(ConfigManager.KEY_HOOK_LOCATION);
+        return value == null || "1".equals(value) || "true".equalsIgnoreCase(value);
+    }
+
+    public boolean updateLocationHookEnabled(boolean enabled) {
+        return updateBooleanExtraProperty(ConfigManager.KEY_HOOK_LOCATION, enabled);
+    }
+
+    private boolean updateBooleanExtraProperty(String key, boolean enabled) {
         try {
             Map<String, String> extraProperties = new LinkedHashMap<>(loadedConfig.getExtraProperties());
-            extraProperties.put(ConfigManager.KEY_APPLY_SCREEN_METRICS, Boolean.toString(enabled));
+            extraProperties.put(key, Boolean.toString(enabled));
             loadedConfig = configFileManager.save(
                 this,
                 loadedConfig.getProfile(),
@@ -404,20 +401,6 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean isTabletNavigation() {
         return getResources().getConfiguration().smallestScreenWidthDp >= 600;
-    }
-
-    private void updateSaveFabPosition() {
-        ViewGroup.LayoutParams rawLayoutParams = binding.saveFab.getLayoutParams();
-        if (!(rawLayoutParams instanceof CoordinatorLayout.LayoutParams)) {
-            return;
-        }
-        CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) rawLayoutParams;
-        int density = getResources().getDisplayMetrics().densityDpi;
-        int marginEnd = Math.round(20f * density / 160f);
-        int marginBottom = Math.round((tabletNavigation ? 24f : 92f) * density / 160f);
-        layoutParams.setMarginEnd(marginEnd);
-        layoutParams.bottomMargin = marginBottom;
-        binding.saveFab.setLayoutParams(layoutParams);
     }
 
     private void scrollFragmentToTop(Fragment fragment) {
@@ -519,9 +502,6 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
                 presets = remotePresets;
-                if (settingsFragment != null) {
-                    settingsFragment.refreshFromHost(true);
-                }
                 if (homeFragment != null) {
                     homeFragment.refresh();
                 }

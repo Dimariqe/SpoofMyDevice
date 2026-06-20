@@ -41,6 +41,8 @@ import java.util.concurrent.TimeUnit;
 public class ConfigManager {
 
     public static final String KEY_APPLY_SCREEN_METRICS = "device.apply_screen_metrics";
+    public static final String KEY_HOOK_WIFI = "device.hook_wifi";
+    public static final String KEY_HOOK_LOCATION = "device.hook_location";
     public static final String KEY_SPOOF_IMEI = "device.imei";
     public static final String KEY_SPOOF_MEID = "device.meid";
     public static final String KEY_SPOOF_IMSI = "device.imsi";
@@ -50,6 +52,11 @@ public class ConfigManager {
     public static final String KEY_SPOOF_GSF_ID = "device.gsf_id";
     public static final String KEY_SPOOF_MEDIA_DRM_ID = "device.media_drm_id";
     public static final String KEY_SPOOF_APP_SET_ID = "device.app_set_id";
+    public static final String KEY_PROXY_ENABLED = "proxy.enabled";
+    public static final String KEY_PROXY_HOST = "proxy.host";
+    public static final String KEY_PROXY_PORT = "proxy.port";
+    public static final String KEY_PROXY_USER = "proxy.user";
+    public static final String KEY_PROXY_PASSWORD = "proxy.password";
     public static final String KEY_SAFE_MODE_PACKAGES = "safe_mode.packages";
     public static final String KEY_SPOOF_TOGGLE_PREFIX = "spoof.enabled.";
 
@@ -83,6 +90,7 @@ public class ConfigManager {
     public static final String FIELD_GSF_ID = "gsf_id";
     public static final String FIELD_MEDIA_DRM_ID = "media_drm_id";
     public static final String FIELD_APP_SET_ID = "app_set_id";
+    public static final String FIELD_PROXY = "proxy";
 
     private static final String[] CONFIG_PATHS = {
         "/data/local/tmp/spoofmydevice_device_profile.conf",
@@ -98,8 +106,14 @@ public class ConfigManager {
     private static Map<String, String> allProperties = null;
     private static boolean usingEmbeddedDefaults = true;
     private static long lastReloadAttemptElapsed = 0L;
+    private static String currentPackageName = null;
 
     public static synchronized void init() {
+        reload(false);
+    }
+
+    public static synchronized void init(String packageName) {
+        currentPackageName = packageName;
         reload(false);
     }
 
@@ -419,12 +433,32 @@ public class ConfigManager {
     }
 
     private static Map<String, String> parseConfigStream(InputStream inputStream) {
-        Map<String, String> config = new HashMap<>();
+        Map<String, String> defaultConfig = new HashMap<>();
+        Map<String, Map<String, String>> profileConfigs = new HashMap<>();
+        Map<String, String> appToProfile = new HashMap<>();
+        String activeProfileId = null;
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
-                if (line.isEmpty() || line.startsWith("#")) {
+                if (line.isEmpty()) {
+                    continue;
+                }
+                if (line.startsWith("#")) {
+                    if (line.startsWith(ConfigFileManager.META_APP_PREFIX)) {
+                        String rest = line.substring(ConfigFileManager.META_APP_PREFIX.length());
+                        int mapIndex = rest.indexOf('=');
+                        if (mapIndex > 0) {
+                            appToProfile.put(rest.substring(0, mapIndex).trim(), rest.substring(mapIndex + 1).trim());
+                        }
+                    } else if (line.startsWith(ConfigFileManager.META_PROFILE_BEGIN_PREFIX)) {
+                        activeProfileId = line.substring(ConfigFileManager.META_PROFILE_BEGIN_PREFIX.length()).trim();
+                        if (!profileConfigs.containsKey(activeProfileId)) {
+                            profileConfigs.put(activeProfileId, new HashMap<String, String>());
+                        }
+                    } else if (line.startsWith(ConfigFileManager.META_PROFILE_END_PREFIX)) {
+                        activeProfileId = null;
+                    }
                     continue;
                 }
 
@@ -435,12 +469,46 @@ public class ConfigManager {
                     if (value.startsWith("\"") && value.endsWith("\"")) {
                         value = value.substring(1, value.length() - 1);
                     }
-                    config.put(key, value);
+                    if (activeProfileId == null) {
+                        defaultConfig.put(key, value);
+                    } else {
+                        Map<String, String> profileConfig = profileConfigs.get(activeProfileId);
+                        if (profileConfig != null) {
+                            profileConfig.put(key, value);
+                        }
+                    }
                 }
             }
         } catch (Exception ignored) {
         }
-        return config;
+        return resolveForCurrentPackage(defaultConfig, profileConfigs, appToProfile);
+    }
+
+    private static Map<String, String> resolveForCurrentPackage(
+        Map<String, String> defaultConfig,
+        Map<String, Map<String, String>> profileConfigs,
+        Map<String, String> appToProfile
+    ) {
+        Map<String, String> result = new HashMap<>(defaultConfig);
+        String packageName = currentPackageName;
+        if (packageName == null || appToProfile.isEmpty()) {
+            return result;
+        }
+        String profileId = appToProfile.get(packageName);
+        if (profileId == null) {
+            return result;
+        }
+        Map<String, String> profileConfig = profileConfigs.get(profileId);
+        if (profileConfig == null) {
+            return result;
+        }
+        for (Map.Entry<String, String> entry : profileConfig.entrySet()) {
+            String value = entry.getValue();
+            if (value != null && !value.isEmpty()) {
+                result.put(entry.getKey(), value);
+            }
+        }
+        return result;
     }
 
     private static Context resolveAnyContext() {
@@ -779,6 +847,22 @@ public class ConfigManager {
         return explicit.equals("1") || explicit.equalsIgnoreCase("true");
     }
 
+    public static boolean shouldHookWifi() {
+        String explicit = getOptionalConfigValue(KEY_HOOK_WIFI);
+        if (explicit == null) {
+            return true;
+        }
+        return explicit.equals("1") || explicit.equalsIgnoreCase("true");
+    }
+
+    public static boolean shouldHookLocation() {
+        String explicit = getOptionalConfigValue(KEY_HOOK_LOCATION);
+        if (explicit == null) {
+            return true;
+        }
+        return explicit.equals("1") || explicit.equalsIgnoreCase("true");
+    }
+
     public static boolean shouldBypassVersionSpoof(String packageName) {
         if (packageName == null || packageName.trim().isEmpty()) {
             return false;
@@ -965,6 +1049,27 @@ public class ConfigManager {
             return null;
         }
         return getOptionalConfigValue(KEY_SPOOF_APP_SET_ID);
+    }
+
+    public static boolean isProxyEnabled() {
+        String explicit = getOptionalConfigValue(KEY_PROXY_ENABLED);
+        return "1".equals(explicit) || "true".equalsIgnoreCase(explicit);
+    }
+
+    public static String getProxyHost() {
+        return getOptionalConfigValue(KEY_PROXY_HOST);
+    }
+
+    public static int getProxyPort() {
+        return parseInt(getConfigValue(KEY_PROXY_PORT), 1080);
+    }
+
+    public static String getProxyUser() {
+        return getOptionalConfigValue(KEY_PROXY_USER);
+    }
+
+    public static String getProxyPassword() {
+        return getOptionalConfigValue(KEY_PROXY_PASSWORD);
     }
 
     public static boolean isConfigAvailable() {

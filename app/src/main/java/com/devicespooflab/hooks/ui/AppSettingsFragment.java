@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 
 import com.devicespooflab.hooks.MainActivity;
 import com.devicespooflab.hooks.R;
+import com.devicespooflab.hooks.proxy.ProxyService;
 import com.devicespooflab.hooks.SafeModeAppsActivity;
 import com.devicespooflab.hooks.data.AppSettingsStore;
 import com.devicespooflab.hooks.databinding.FragmentAppSettingsBinding;
@@ -35,6 +36,8 @@ public class AppSettingsFragment extends Fragment {
     private boolean applying;
     private boolean systemColorsToggleFromRow;
     private boolean resolutionToggleFromRow;
+    private boolean hookWifiToggleFromRow;
+    private boolean hookLocationToggleFromRow;
     private List<Option> themeOptions;
     private List<Option> languageOptions;
     private List<Option> colorStyleOptions;
@@ -114,6 +117,8 @@ public class AppSettingsFragment extends Fragment {
         binding.systemColorsSwitch.setChecked(systemColorsEnabled);
         binding.colorStyleRow.setVisibility(systemColorsEnabled ? View.GONE : View.VISIBLE);
         binding.resolutionSwitch.setChecked(activity.isScreenMetricsSpoofEnabled());
+        binding.hookWifiSwitch.setChecked(activity.isWifiHookEnabled());
+        binding.hookLocationSwitch.setChecked(activity.isLocationHookEnabled());
         applying = false;
     }
 
@@ -128,7 +133,8 @@ public class AppSettingsFragment extends Fragment {
             new Option(AppSettingsStore.LANGUAGE_ENGLISH, getString(R.string.language_english)),
             new Option(AppSettingsStore.LANGUAGE_KOREAN, getString(R.string.language_korean)),
             new Option(AppSettingsStore.LANGUAGE_JAPANESE, getString(R.string.language_japanese)),
-            new Option(AppSettingsStore.LANGUAGE_CHINESE_SIMPLIFIED, getString(R.string.language_chinese))
+            new Option(AppSettingsStore.LANGUAGE_CHINESE_SIMPLIFIED, getString(R.string.language_chinese)),
+            new Option(AppSettingsStore.LANGUAGE_RUSSIAN, getString(R.string.language_russian))
         );
         colorStyleOptions = Arrays.asList(
             new Option(AppSettingsStore.COLOR_STYLE_MINT, getString(R.string.color_style_mint)),
@@ -184,6 +190,56 @@ public class AppSettingsFragment extends Fragment {
                 applying = false;
             }
         });
+
+        binding.hookWifiRow.setOnClickListener(v -> {
+            hookWifiToggleFromRow = true;
+            binding.hookWifiSwitch.toggle();
+        });
+        binding.hookWifiSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            boolean userInitiated = buttonView.isPressed() || hookWifiToggleFromRow;
+            hookWifiToggleFromRow = false;
+            if (applying || !userInitiated || !(requireActivity() instanceof MainActivity)) {
+                return;
+            }
+            MainActivity activity = (MainActivity) requireActivity();
+            boolean updated = activity.updateWifiHookEnabled(isChecked);
+            if (!updated) {
+                applying = true;
+                binding.hookWifiSwitch.setChecked(!isChecked);
+                applying = false;
+            }
+        });
+
+        binding.hookLocationRow.setOnClickListener(v -> {
+            hookLocationToggleFromRow = true;
+            binding.hookLocationSwitch.toggle();
+        });
+        binding.hookLocationSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            boolean userInitiated = buttonView.isPressed() || hookLocationToggleFromRow;
+            hookLocationToggleFromRow = false;
+            if (applying || !userInitiated || !(requireActivity() instanceof MainActivity)) {
+                return;
+            }
+            MainActivity activity = (MainActivity) requireActivity();
+            boolean updated = activity.updateLocationHookEnabled(isChecked);
+            if (!updated) {
+                applying = true;
+                binding.hookLocationSwitch.setChecked(!isChecked);
+                applying = false;
+            }
+        });
+
+        binding.resetIptablesRow.setOnClickListener(v -> showResetIptablesDialog());
+    }
+
+    private void showResetIptablesDialog() {
+        new MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.settings_reset_iptables_title)
+            .setMessage(R.string.settings_reset_iptables_confirm)
+            .setPositiveButton(R.string.settings_reset_iptables_title, (dialog, which) ->
+                ProxyService.resetAndStop(requireContext()))
+            .setNegativeButton(android.R.string.cancel, null)
+            .show();
     }
 
     private void showThemeDialog() {

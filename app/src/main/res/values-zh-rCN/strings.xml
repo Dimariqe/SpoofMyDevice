@@ -85,6 +85,7 @@
     <string name="language_korean">한국어</string>
     <string name="language_japanese">日本語</string>
     <string name="language_chinese">简体中文</string>
+    <string name="language_russian">俄语 (Russian)</string>
     <string name="settings_theme_helper">选择配套应用的显示方式。</string>
     <string name="settings_language_helper">默认将跟随系统语言。你也可以强制使用英语、韩语、日语或简体中文。</string>
     <string name="settings_theme_summary">当前：%1$s</string>
@@ -106,6 +107,14 @@
     <string name="safe_mode_version_unknown">版本：未知</string>
     <string name="settings_section_preset_mode">预设与模式</string>
     <string name="settings_section_identity">设备信息</string>
+    <string name="settings_section_proxy">代理</string>
+    <string name="settings_field_proxy_enabled">启用 SOCKS5 代理</string>
+    <string name="settings_field_proxy_host">主机</string>
+    <string name="settings_field_proxy_port">端口</string>
+    <string name="settings_button_check_proxy">检查代理</string>
+    <string name="proxy_checking">正在检查连接...</string>
+    <string name="proxy_success">代理 OK: %1$s (%2$s)</string>
+    <string name="proxy_failed">代理检查失败: %1$s</string>
     <string name="settings_section_build_display">构建与显示</string>
     <string name="settings_section_network_region">网络与地区</string>
     <string name="settings_section_advanced">高级设置</string>

@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+    <string name="app_name">SpoofMyDevice</string>
+    <string
+        name="xposed_description"
+    >Утилита-компаньон LSPosed для управления профилями подмены устройства и конфигурацией хуков.</string>
+    <string name="tab_home">Главная</string>
+    <string name="tab_settings">Профили</string>
+    <string name="tab_app_settings">Настройки</string>
+    <string name="tab_real_info">Инфо</string>
+    <string name="toolbar_home">Главная</string>
+    <string name="toolbar_settings">Настройки устройства</string>
+    <string name="toolbar_spoof_profiles">Профили подмены</string>
+    <string name="toolbar_app_settings">Настройки</string>
+    <string name="toolbar_real_info">О приложении</string>
+    <string name="save_profile">Сохранить</string>
+    <string name="status_config_ready">Конфигурация готова</string>
+    <string name="status_default_profile">Используется профиль по умолчанию</string>
+    <string name="mode_preset">Пресет</string>
+    <string name="mode_custom">Пользовательский</string>
+    <string
+        name="save_success"
+    >Профиль сохранен. Перезапустите целевые приложения, чтобы применить новые значения.</string>
+    <string name="save_failed">Не удалось сохранить профиль.</string>
+    <string
+        name="real_info_helper"
+    >О приложении и ссылки на проект.</string>
+    <string name="home_module_active_title">Модуль активен</string>
+    <string
+        name="home_module_active_body"
+    >LSPosed применяет этот модуль.</string>
+    <string name="home_module_inactive_title">Модуль не активен</string>
+    <string
+        name="home_module_inactive_body"
+    >Пожалуйста, активируйте модуль в LSPosed.</string>
+    <string name="home_active_profile_title">Активный профиль</string>
+    <string name="home_config_file_title">Файл конфигурации</string>
+    <string name="home_info_profile_model_title">Модель устройства</string>
+    <string name="home_info_profile_preset_title">Пресет</string>
+    <string name="home_info_profile_mode_title">Режим</string>
+    <string name="home_info_profile_android_title">Версия Android</string>
+    <string name="home_info_profile_display_title">Экран</string>
+    <string name="home_info_profile_fingerprint_title">Fingerprint</string>
+    <string name="home_info_config_status_title">Статус файла</string>
+    <string name="home_info_config_source_title">Хранилище</string>
+    <string name="home_info_config_name_title">Имя файла</string>
+    <string name="home_info_config_updated_title">Последнее обновление</string>
+    <string name="home_info_config_path_title">Путь</string>
+    <string
+        name="home_info_android_value_format"
+    >Android %1$s (SDK %2$d)</string>
+    <string name="home_info_display_value_format">%1$dx%2$d / %3$ddpi</string>
+    <string
+        name="home_profile_meta_format"
+    >Режим %1$s - %2$s - Android %3$s (SDK %4$d) - %5$dx%6$d / %7$ddpi</string>
+    <string name="home_fingerprint_format">Fingerprint\n%1$s</string>
+    <string name="home_path_format">Путь\n%1$s</string>
+    <string name="home_updated_format">Последнее обновление\n%1$s</string>
+    <string name="home_not_available">Недоступно</string>
+    <string name="module_status_active">Активен</string>
+    <string name="module_status_inactive">Неактивен</string>
+    <string
+        name="home_scope_hint"
+    >Добавьте целевые приложения в область видимости LSPosed, сохраните профиль и перезапустите эти приложения.</string>
+    <string name="preset_unknown">Снимок</string>
+    <string name="preset_current_device_brand">Текущий</string>
+    <string name="preset_current_device_model">Девайс</string>
+    <string
+        name="preset_current_device_summary"
+    >Реальные значения этого устройства</string>
+    <string name="config_source_internal">Внутреннее хранилище</string>
+    <string name="config_source_fallback">Внешнее хранилище (резерв)</string>
+    <string name="open_real_info">Открыть информацию</string>
+    <string name="settings_theme_title">Тема</string>
+    <string name="settings_appearance_title">Внешний вид</string>
+    <string name="settings_tools_title">Инструменты</string>
+    <string name="settings_diagnostics_title">Диагностика</string>
+    <string name="settings_presets_title">Пресеты</string>
+    <string name="settings_runtime_title">Опции выполнения</string>
+    <string name="settings_real_info_title">О приложении</string>
+    <string name="settings_preset_source_title">Источник пресетов</string>
+    <string
+        name="settings_preset_source_message"
+    >Введите URL-адрес репозитория GitHub с JSON-файлами пресетов.</string>
+    <string name="settings_preset_source_option_default">По умолчанию</string>
+    <string name="settings_preset_source_option_custom">Свой</string>
+    <string
+        name="settings_preset_source_input_hint"
+    >URL репозитория GitHub</string>
+    <string
+        name="settings_preset_source_required"
+    >Введите URL-адрес источника пресетов.</string>
+    <string
+        name="settings_preset_source_updated"
+    >Источник пресетов обновлен.</string>
+    <string
+        name="settings_preset_source_empty"
+    >Удаленные пресеты не найдены.</string>
+    <string
+        name="settings_preset_source_failed"
+    >Ошибка обновления источника.</string>
+    <string name="settings_system_colors_title">Системные цвета</string>
+    <string
+        name="settings_system_colors_summary"
+    >Использовать цвета Material You из системы.</string>
+    <string name="settings_color_style_title">Цветовой стиль</string>
+    <string name="settings_color_style_summary">Текущий: %1$s</string>
+    <string name="theme_system">Системная</string>
+    <string name="theme_light">Светлая</string>
+    <string name="theme_dark">Темная</string>
+    <string name="color_style_mint">Мята</string>
+    <string name="color_style_blue">Синий</string>
+    <string name="color_style_rose">Роза</string>
+    <string name="color_style_amber">Янтарный</string>
+    <string name="settings_language_title">Язык</string>
+    <string name="language_default">Системный</string>
+    <string name="language_english">English</string>
+    <string name="language_korean">한국어</string>
+    <string name="language_japanese">日本語</string>
+    <string name="language_chinese">简体中文</string>
+    <string name="language_russian">Русский</string>
+    <string
+        name="settings_theme_helper"
+    >Выберите тему оформления приложения.</string>
+    <string
+        name="settings_language_helper"
+    >По умолчанию используется системный язык. Вы также можете принудительно установить язык.</string>
+    <string name="settings_theme_summary">Текущая: %1$s</string>
+    <string name="settings_language_summary">Текущий: %1$s</string>
+    <string
+        name="settings_real_info_summary"
+    >Сведения о приложении и ссылки.</string>
+    <string name="settings_choose_theme">Выберите тему</string>
+    <string name="settings_choose_language">Выберите язык</string>
+    <string name="settings_choose_color_style">Выберите стиль</string>
+    <string
+        name="settings_resolution_title"
+    >Подменять разрешение экрана</string>
+    <string
+        name="settings_resolution_summary"
+    >Выключено. Некоторые приложения могут работать некорректно.</string>
+    <string name="settings_hook_wifi_title">Подмена Wi-Fi</string>
+    <string name="settings_hook_wifi_summary">Возвращать пустой список сетей Wi-Fi.</string>
+    <string name="settings_hook_location_title">Подмена местоположения</string>
+    <string name="settings_hook_location_summary">Возвращать null для запросов локации.</string>
+    <string name="settings_safe_mode_title">Безопасный режим</string>
+    <string
+        name="settings_safe_mode_summary_disabled"
+    >Отключение подмены для выбранных приложений.</string>
+    <string name="settings_safe_mode_summary_count">Защищено: %1$d</string>
+    <string
+        name="settings_safe_mode_failed"
+    >Не удалось обновить режим.</string>
+    <string name="settings_profiles_title">Профили</string>
+    <string name="profile_edit_name_hint">Имя профиля</string>
+    <string name="profile_edit_apps_none">Выберите приложения</string>
+    <string name="profile_edit_apps_count">Назначено: %1$d</string>
+    <string name="spoof_profiles_default_name">Профиль по умолчанию</string>
+    <string name="spoof_profiles_default_summary">Глобальные настройки</string>
+    <string name="spoof_profiles_section_header">Профили приложений</string>
+    <string name="spoof_profiles_empty">Профилей нет. Нажмите «Добавить профиль».</string>
+    <string
+        name="settings_profiles_summary_empty"
+    >Назначение профилей конкретным приложениям.</string>
+    <string
+        name="settings_profiles_summary_count"
+    >Профилей: %1$d</string>
+    <string
+        name="profiles_empty"
+    >Профилей нет. Нажмите «Добавить профиль».</string>
+    <string name="profiles_add">Добавить профиль</string>
+    <string
+        name="profiles_choose_preset"
+    >Выберите устройство для профиля</string>
+    <string
+        name="profiles_presets_unavailable"
+    >Пресеты загружаются. Подождите.</string>
+    <string name="profiles_action_assign_apps">Назначить приложения</string>
+    <string name="profiles_action_rename">Переименовать</string>
+    <string name="profiles_action_delete">Удалить</string>
+    <string name="profiles_delete_confirm">Удалить профиль «%1$s»?</string>
+    <string name="profiles_no_apps">Нет приложений</string>
+    <string name="profiles_app_count">Назначено: %1$d</string>
+    <string name="safe_mode_empty">Приложения не найдены.</string>
+    <string name="safe_mode_system_framework">System Framework</string>
+    <string name="safe_mode_hide_system_apps">Скрыть системные</string>
+    <string name="safe_mode_version_format">Версия: %1$s</string>
+    <string name="safe_mode_version_unknown">Версия: неизвестна</string>
+    <string name="settings_section_preset_mode">Пресет и режим</string>
+    <string name="settings_section_identity">Идентификация</string>
+    <string name="settings_section_proxy">Прокси</string>
+    <string name="settings_field_proxy_enabled">Включить SOCKS5 прокси</string>
+    <string name="settings_field_proxy_host">Хост</string>
+    <string name="settings_field_proxy_port">Порт</string>
+    <string name="settings_field_proxy_user">Логин (опционально)</string>
+    <string name="settings_field_proxy_password">Пароль (опционально)</string>
+    <string name="settings_button_check_proxy">Проверить прокси</string>
+    <string name="proxy_checking">Проверка...</string>
+    <string name="proxy_success">Прокси OK: %1$s (%2$s)</string>
+    <string name="proxy_failed">Ошибка: %1$s</string>
+    <string name="settings_section_build_display">Сборка и экран</string>
+    <string name="settings_section_network_region">Сеть и регион</string>
+    <string name="settings_section_advanced">Дополнительно</string>
+    <string
+        name="settings_advanced_summary"
+    >Оставьте пустым для реальных значений.</string>
+    <string name="settings_generate_random">Случайное значение</string>
+    <string name="settings_clear_all">Очистить все</string>
+    <string name="settings_hint_preset">Пресет</string>
+    <string name="settings_field_brand">Бренд</string>
+    <string name="settings_field_manufacturer">Производитель</string>
+    <string name="settings_field_model">Модель</string>
+    <string name="settings_field_device_codename">Кодовое имя</string>
+    <string name="settings_field_product_name">Название продукта</string>
+    <string name="settings_field_board">Плата</string>
+    <string name="settings_field_hardware">Железо</string>
+    <string name="settings_field_board_platform">Платформа</string>
+    <string name="settings_field_android_release">Версия Android</string>
+    <string name="settings_field_sdk_level">Уровень SDK</string>
+    <string name="settings_field_security_patch">Патч безопасности</string>
+    <string name="settings_field_build_id">Build ID</string>
+    <string name="settings_field_build_incremental">Build incremental</string>
+    <string name="settings_field_fingerprint">Fingerprint</string>
+    <string name="settings_field_screen_width">Ширина экрана</string>
+    <string name="settings_field_screen_height">Высота экрана</string>
+    <string name="settings_field_screen_density">Плотность экрана</string>
+    <string name="settings_field_operator_name">Имя оператора</string>
+    <string name="settings_field_operator_numeric">Код оператора</string>
+    <string name="settings_field_sim_country_iso">ISO страны SIM</string>
+    <string name="settings_field_timezone">Часовой пояс</string>
+    <string name="settings_field_imei">IMEI</string>
+    <string name="settings_field_meid">MEID</string>
+    <string name="settings_field_imsi">IMSI</string>
+    <string name="settings_field_iccid">ICCID</string>
+    <string name="settings_field_phone_number">Номер телефона</string>
+    <string name="settings_field_gaid">Google Advertising ID</string>
+    <string name="settings_field_gsf_id">GSF ID</string>
+    <string name="settings_field_media_drm_id">MediaDrm ID (hex)</string>
+    <string name="settings_field_app_set_id">App Set ID</string>
+    <string
+        name="settings_custom_summary"
+    >Редактирование на основе %1$s - %2$s</string>
+    <string name="settings_preset_summary">%1$s - %2$s</string>
+    <string name="settings_app_info_title">О приложении</string>
+    <string
+        name="settings_app_info_body"
+    >Утилита для модуля LSPosed. Используйте эту страницу для настроек и диагностики.</string>
+    <string
+        name="settings_app_info_format"
+    >%1$s\n\nВерсия: %2$s (%3$d)\nПакет: %4$s</string>
+    <string name="settings_saved">Обновлено.</string>
+    <string name="app_info_intro_format">%1$s\n%2$s</string>
+    <string name="app_info_overview_title">Обзор</string>
+    <string name="app_info_credits_title">Благодарности</string>
+    <string name="app_info_links_title">Ссылки</string>
+    <string name="app_info_description_title">Описание</string>
+    <string name="app_info_package_title">Имя пакета</string>
+    <string name="app_info_version_format">Версия %1$s (%2$d)</string>
+    <string
+        name="app_info_overview_format"
+    >Имя: %1$s\nВерсия: %2$s (%3$d)\nПакет: %4$s</string>
+    <string
+        name="app_info_credits_body"
+    >Основано на проекте DeviceSpoofLab Hooks.\nСпасибо сообществам LSPosed и Xposed.</string>
+    <string
+        name="app_info_links_body"
+    >Ссылка на GitHub и ресурсы проекта.</string>
+    <string name="app_info_github_button">GitHub</string>
+    <string name="app_info_github_title">GitHub</string>
+    <string
+        name="app_info_github_summary"
+    >github.com/BuSung-dev/SpoofMyDevice</string>
+    <string name="app_info_link_failed">Не удалось открыть браузер.</string>
+    <string
+        name="real_info_button_helper"
+    >Используйте «Инфо», чтобы сравнить текущие значения с целью подмены.</string>
+    <string name="real_info_build_title">Build значения (runtime)</string>
+    <string
+        name="real_info_runtime_title"
+    >Экран и ID (runtime)</string>
+    <string name="real_info_saved_title">Цель подмены</string>
+    <string
+        name="real_info_build_format"
+    >Бренд: %1$s\nПроизводитель: %2$s\nМодель: %3$s\nДевайс: %4$s\nПлата: %5$s\nЖелезо: %6$s\nFingerprint: %7$s\nAndroid: %8$s\nSDK: %9$d\nПатч: %10$s</string>
+    <string
+        name="real_info_runtime_format"
+    >Разрешение: %1$dx%2$d\nПлотность: %3$ddpi\nABI: %4$s\nПояс: %5$s</string>
+    <string
+        name="real_info_saved_format"
+    >Пресет: %1$s\nРежим: %2$s\nМодель: %3$s\nДевайс: %4$s\nFingerprint: %5$s\nЭкран: %6$dx%7$d / %8$ddpi\nПодмена экрана: %9$s</string>
+    <string name="state_enabled">Включено</string>
+    <string name="state_disabled">Выключено</string>
+
+    <!-- Empty scope - user selects apps in LSPosed -->
+    <string-array name="xposed_scope" />
+</resources>

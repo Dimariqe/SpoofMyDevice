@@ -5,6 +5,7 @@
 *.class
 /build/
 /app/build/
+app/.cxx/
 
 # Gradle
 .gradle/
@@ -12,6 +13,7 @@ local.properties
 
 # IDE
 .idea/
+.claude/
 *.iml
 
 # OS

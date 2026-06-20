@@ -1,13 +1,16 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <resources>
     <string name="app_name">SpoofMyDevice</string>
-    <string name="xposed_description">LSPosed companion utility for managing spoofed device profiles and runtime hook configuration.</string>
+    <string
+        name="xposed_description"
+    >LSPosed companion utility for managing spoofed device profiles and runtime hook configuration.</string>
     <string name="tab_home">Home</string>
-    <string name="tab_settings">Device Settings</string>
+    <string name="tab_settings">Profiles</string>
     <string name="tab_app_settings">Settings</string>
     <string name="tab_real_info">App Info</string>
     <string name="toolbar_home">Home</string>
     <string name="toolbar_settings">Device Settings</string>
+    <string name="toolbar_spoof_profiles">Spoof Profiles</string>
     <string name="toolbar_app_settings">Settings</string>
     <string name="toolbar_real_info">App Info</string>
     <string name="save_profile">Save</string>
@@ -15,13 +18,21 @@
     <string name="status_default_profile">Using default profile</string>
     <string name="mode_preset">Preset</string>
     <string name="mode_custom">Custom</string>
-    <string name="save_success">Profile saved. Restart target apps to apply the new spoof values.</string>
+    <string
+        name="save_success"
+    >Profile saved. Restart target apps to apply the new spoof values.</string>
     <string name="save_failed">Failed to save the profile.</string>
-    <string name="real_info_helper">About this companion app and its project links.</string>
+    <string
+        name="real_info_helper"
+    >About this companion app and its project links.</string>
     <string name="home_module_active_title">Module is active</string>
-    <string name="home_module_active_body">LSPosed is applying this module.</string>
+    <string
+        name="home_module_active_body"
+    >LSPosed is applying this module.</string>
     <string name="home_module_inactive_title">Module is not active</string>
-    <string name="home_module_inactive_body">Please activate the module in LSPosed.</string>
+    <string
+        name="home_module_inactive_body"
+    >Please activate the module in LSPosed.</string>
     <string name="home_active_profile_title">Active profile</string>
     <string name="home_config_file_title">Config file</string>
     <string name="home_info_profile_model_title">Device model</string>
@@ -35,20 +46,28 @@
     <string name="home_info_config_name_title">File name</string>
     <string name="home_info_config_updated_title">Last updated</string>
     <string name="home_info_config_path_title">Path</string>
-    <string name="home_info_android_value_format">Android %1$s (SDK %2$d)</string>
+    <string
+        name="home_info_android_value_format"
+    >Android %1$s (SDK %2$d)</string>
     <string name="home_info_display_value_format">%1$dx%2$d / %3$ddpi</string>
-    <string name="home_profile_meta_format">%1$s mode - %2$s - Android %3$s (SDK %4$d) - %5$dx%6$d / %7$ddpi</string>
+    <string
+        name="home_profile_meta_format"
+    >%1$s mode - %2$s - Android %3$s (SDK %4$d) - %5$dx%6$d / %7$ddpi</string>
     <string name="home_fingerprint_format">Fingerprint\n%1$s</string>
     <string name="home_path_format">Path\n%1$s</string>
     <string name="home_updated_format">Last updated\n%1$s</string>
     <string name="home_not_available">Not available</string>
     <string name="module_status_active">Active</string>
     <string name="module_status_inactive">Inactive</string>
-    <string name="home_scope_hint">Add target apps to LSPosed scope, save the profile, and restart those apps to pick up new values.</string>
+    <string
+        name="home_scope_hint"
+    >Add target apps to LSPosed scope, save the profile, and restart those apps to pick up new values.</string>
     <string name="preset_unknown">Custom snapshot</string>
     <string name="preset_current_device_brand">Current</string>
     <string name="preset_current_device_model">Device</string>
-    <string name="preset_current_device_summary">Live values from this device</string>
+    <string
+        name="preset_current_device_summary"
+    >Live values from this device</string>
     <string name="config_source_internal">App private storage</string>
     <string name="config_source_fallback">External storage fallback</string>
     <string name="open_real_info">Open App Info</string>
@@ -60,16 +79,30 @@
     <string name="settings_runtime_title">Runtime Options</string>
     <string name="settings_real_info_title">App Info</string>
     <string name="settings_preset_source_title">Preset source URL</string>
-    <string name="settings_preset_source_message">Enter a GitHub repository URL that contains preset JSON files.</string>
+    <string
+        name="settings_preset_source_message"
+    >Enter a GitHub repository URL that contains preset JSON files.</string>
     <string name="settings_preset_source_option_default">Default</string>
     <string name="settings_preset_source_option_custom">Custom</string>
-    <string name="settings_preset_source_input_hint">GitHub repository URL</string>
-    <string name="settings_preset_source_required">Enter a custom preset source URL.</string>
-    <string name="settings_preset_source_updated">Preset source updated.</string>
-    <string name="settings_preset_source_empty">No remote presets were found at the current source URL.</string>
-    <string name="settings_preset_source_failed">Failed to update the preset source.</string>
+    <string
+        name="settings_preset_source_input_hint"
+    >GitHub repository URL</string>
+    <string
+        name="settings_preset_source_required"
+    >Enter a custom preset source URL.</string>
+    <string
+        name="settings_preset_source_updated"
+    >Preset source updated.</string>
+    <string
+        name="settings_preset_source_empty"
+    >No remote presets were found at the current source URL.</string>
+    <string
+        name="settings_preset_source_failed"
+    >Failed to update the preset source.</string>
     <string name="settings_system_colors_title">Use system colors</string>
-    <string name="settings_system_colors_summary">Use Material You colors from the system when available.</string>
+    <string
+        name="settings_system_colors_summary"
+    >Use Material You colors from the system when available.</string>
     <string name="settings_color_style_title">Color style</string>
     <string name="settings_color_style_summary">Current: %1$s</string>
     <string name="theme_system">System</string>
@@ -85,20 +118,69 @@
     <string name="language_korean">한국어</string>
     <string name="language_japanese">日本語</string>
     <string name="language_chinese">简体中文</string>
-    <string name="settings_theme_helper">Choose how the companion app should render.</string>
-    <string name="settings_language_helper">Default follows the system language. You can also force English, Korean, or Japanese.</string>
+    <string name="language_russian">Русский</string>
+    <string
+        name="settings_theme_helper"
+    >Choose how the companion app should render.</string>
+    <string
+        name="settings_language_helper"
+    >Default follows the system language. You can also force English, Korean, Japanese, or Russian.</string>
     <string name="settings_theme_summary">Current: %1$s</string>
     <string name="settings_language_summary">Current: %1$s</string>
-    <string name="settings_real_info_summary">Open app details, credits, and project links.</string>
+    <string
+        name="settings_real_info_summary"
+    >Open app details, credits, and project links.</string>
     <string name="settings_choose_theme">Choose theme</string>
     <string name="settings_choose_language">Choose language</string>
     <string name="settings_choose_color_style">Choose color style</string>
-    <string name="settings_resolution_title">Apply spoofed screen resolution</string>
-    <string name="settings_resolution_summary">Off by default. Some apps may break when forced.</string>
+    <string
+        name="settings_resolution_title"
+    >Apply spoofed screen resolution</string>
+    <string
+        name="settings_resolution_summary"
+    >Off by default. Some apps may break when forced.</string>
+    <string name="settings_hook_wifi_title">Spoof Wi-Fi scan results</string>
+    <string name="settings_hook_wifi_summary">Return empty Wi-Fi scan list to prevent triangulation.</string>
+    <string name="settings_hook_location_title">Spoof location</string>
+    <string name="settings_hook_location_summary">Return null for last known location requests.</string>
     <string name="settings_safe_mode_title">Safe Mode</string>
-    <string name="settings_safe_mode_summary_disabled">Reduce crashes by disabling selected spoof options.</string>
+    <string
+        name="settings_safe_mode_summary_disabled"
+    >Reduce crashes by disabling selected spoof options.</string>
     <string name="settings_safe_mode_summary_count">%1$d apps protected</string>
-    <string name="settings_safe_mode_failed">Failed to update Safe Mode.</string>
+    <string
+        name="settings_safe_mode_failed"
+    >Failed to update Safe Mode.</string>
+    <string name="settings_profiles_title">Profiles</string>
+    <string name="profile_edit_name_hint">Profile name</string>
+    <string name="profile_edit_apps_none">Choose apps to assign</string>
+    <string name="profile_edit_apps_count">%1$d apps assigned</string>
+    <string name="spoof_profiles_default_name">Default Profile</string>
+    <string name="spoof_profiles_default_summary">Global device settings for all apps</string>
+    <string name="spoof_profiles_section_header">App-Specific Profiles</string>
+    <string name="spoof_profiles_empty">No profiles yet. Tap Add profile to create one.</string>
+    <string
+        name="settings_profiles_summary_empty"
+    >Assign separate device profiles to specific apps.</string>
+    <string
+        name="settings_profiles_summary_count"
+    >%1$d profiles configured</string>
+    <string
+        name="profiles_empty"
+    >No profiles yet. Tap Add profile to create one.</string>
+    <string name="profiles_add">Add profile</string>
+    <string
+        name="profiles_choose_preset"
+    >Choose a device for this profile</string>
+    <string
+        name="profiles_presets_unavailable"
+    >Device presets are still loading. Please try again in a moment.</string>
+    <string name="profiles_action_assign_apps">Assign apps</string>
+    <string name="profiles_action_rename">Rename</string>
+    <string name="profiles_action_delete">Delete</string>
+    <string name="profiles_delete_confirm">Delete profile "%1$s"?</string>
+    <string name="profiles_no_apps">No apps assigned</string>
+    <string name="profiles_app_count">%1$d apps assigned</string>
     <string name="safe_mode_empty">No installed apps found.</string>
     <string name="safe_mode_system_framework">System Framework</string>
     <string name="safe_mode_hide_system_apps">Hide system apps</string>
@@ -106,10 +188,22 @@
     <string name="safe_mode_version_unknown">Version: unknown</string>
     <string name="settings_section_preset_mode">Preset and mode</string>
     <string name="settings_section_identity">Identity</string>
+    <string name="settings_section_proxy">Proxy</string>
+    <string name="settings_field_proxy_enabled">Enable SOCKS5 Proxy</string>
+    <string name="settings_field_proxy_host">Host</string>
+    <string name="settings_field_proxy_port">Port</string>
+    <string name="settings_field_proxy_user">Login (optional)</string>
+    <string name="settings_field_proxy_password">Password (optional)</string>
+    <string name="settings_button_check_proxy">Check Proxy</string>
+    <string name="proxy_checking">Checking connectivity...</string>
+    <string name="proxy_success">Proxy OK: %1$s (%2$s)</string>
+    <string name="proxy_failed">Proxy check failed: %1$s</string>
     <string name="settings_section_build_display">Build and display</string>
     <string name="settings_section_network_region">Network and region</string>
     <string name="settings_section_advanced">Advanced</string>
-    <string name="settings_advanced_summary">Leave these blank to keep the real device values.</string>
+    <string
+        name="settings_advanced_summary"
+    >Leave these blank to keep the real device values.</string>
     <string name="settings_generate_random">Generate random value</string>
     <string name="settings_clear_all">Clear all</string>
     <string name="settings_hint_preset">Preset</string>
@@ -143,11 +237,17 @@
     <string name="settings_field_gsf_id">GSF ID</string>
     <string name="settings_field_media_drm_id">MediaDrm ID (hex)</string>
     <string name="settings_field_app_set_id">App Set ID</string>
-    <string name="settings_custom_summary">Custom editing based on %1$s - %2$s</string>
+    <string
+        name="settings_custom_summary"
+    >Custom editing based on %1$s - %2$s</string>
     <string name="settings_preset_summary">%1$s - %2$s</string>
     <string name="settings_app_info_title">App Info</string>
-    <string name="settings_app_info_body">Companion utility for the LSPosed module. Use this page for runtime app settings and diagnostics shortcuts.</string>
-    <string name="settings_app_info_format">%1$s\n\nVersion: %2$s (%3$d)\nPackage: %4$s</string>
+    <string
+        name="settings_app_info_body"
+    >Companion utility for the LSPosed module. Use this page for runtime app settings and diagnostics shortcuts.</string>
+    <string
+        name="settings_app_info_format"
+    >%1$s\n\nVersion: %2$s (%3$d)\nPackage: %4$s</string>
     <string name="settings_saved">Setting updated.</string>
     <string name="app_info_intro_format">%1$s\n%2$s</string>
     <string name="app_info_overview_title">Overview</string>
@@ -156,23 +256,53 @@
     <string name="app_info_description_title">Description</string>
     <string name="app_info_package_title">Package name</string>
     <string name="app_info_version_format">Version %1$s (%2$d)</string>
-    <string name="app_info_overview_format">App name: %1$s\nVersion: %2$s (%3$d)\nPackage: %4$s</string>
-    <string name="app_info_credits_body">Based on the original DeviceSpoofLab Hooks project.\nThanks to the LSPosed and Xposed communities.</string>
-    <string name="app_info_links_body">GitHub project link and future source links will appear here.</string>
+    <string
+        name="app_info_overview_format"
+    >App name: %1$s\nVersion: %2$s (%3$d)\nPackage: %4$s</string>
+    <string
+        name="app_info_credits_body"
+    >Based on the original DeviceSpoofLab Hooks project.\nThanks to the LSPosed and Xposed communities.</string>
+    <string
+        name="app_info_links_body"
+    >GitHub project link and future source links will appear here.</string>
     <string name="app_info_github_button">Open GitHub</string>
     <string name="app_info_github_title">GitHub</string>
-    <string name="app_info_github_summary">github.com/BuSung-dev/SpoofMyDevice</string>
+    <string
+        name="app_info_github_summary"
+    >github.com/BuSung-dev/SpoofMyDevice</string>
     <string name="app_info_link_failed">Unable to open the browser.</string>
-    <string name="real_info_button_helper">Use App Info to compare the current runtime values against the saved spoof target.</string>
+    <string
+        name="real_info_button_helper"
+    >Use App Info to compare the current runtime values against the saved spoof target.</string>
     <string name="real_info_build_title">Runtime build values</string>
-    <string name="real_info_runtime_title">Runtime display and identifiers</string>
+    <string
+        name="real_info_runtime_title"
+    >Runtime display and identifiers</string>
     <string name="real_info_saved_title">Saved spoof target</string>
-    <string name="real_info_build_format">Brand: %1$s\nManufacturer: %2$s\nModel: %3$s\nDevice: %4$s\nBoard: %5$s\nHardware: %6$s\nFingerprint: %7$s\nRelease: %8$s\nSDK: %9$d\nSecurity patch: %10$s</string>
-    <string name="real_info_runtime_format">Resolution: %1$dx%2$d\nDensity: %3$ddpi\nABIs: %4$s\nTimezone: %5$s</string>
-    <string name="real_info_saved_format">Preset: %1$s\nMode: %2$s\nTarget model: %3$s\nTarget device: %4$s\nTarget fingerprint: %5$s\nTarget resolution: %6$dx%7$d / %8$ddpi\nApply spoofed resolution: %9$s</string>
+    <string
+        name="real_info_build_format"
+    >Brand: %1$s\nManufacturer: %2$s\nModel: %3$s\nDevice: %4$s\nBoard: %5$s\nHardware: %6$s\nFingerprint: %7$s\nRelease: %8$s\nSDK: %9$d\nSecurity patch: %10$s</string>
+    <string
+        name="real_info_runtime_format"
+    >Resolution: %1$dx%2$d\nDensity: %3$ddpi\nABIs: %4$s\nTimezone: %5$s</string>
+    <string
+        name="real_info_saved_format"
+    >Preset: %1$s\nMode: %2$s\nTarget model: %3$s\nTarget device: %4$s\nTarget fingerprint: %5$s\nTarget resolution: %6$dx%7$d / %8$ddpi\nApply spoofed resolution: %9$s</string>
     <string name="state_enabled">Enabled</string>
     <string name="state_disabled">Disabled</string>
 
     <!-- Empty scope - user selects apps in LSPosed -->
     <string-array name="xposed_scope" />
+
+    <!-- Proxy service notifications -->
+    <string name="proxy_notif_channel">Proxy Relay</string>
+    <string name="proxy_notif_channel_desc">Background SOCKS5 relay for per-profile proxy routing</string>
+    <string name="proxy_notif_title">SpoofMyDevice Proxy</string>
+    <string name="proxy_notif_text">Routing app traffic through configured proxies</string>
+
+    <!-- Proxy / iptables settings row -->
+    <string name="settings_proxy_section_title">Proxy</string>
+    <string name="settings_reset_iptables_title">Reset iptables rules</string>
+    <string name="settings_reset_iptables_summary">Remove custom proxy routing chains and stop relay</string>
+    <string name="settings_reset_iptables_confirm">This will delete all SPOOFMYD iptables chains and stop the proxy relay service. App traffic will no longer be routed through any proxy.</string>
 </resources>

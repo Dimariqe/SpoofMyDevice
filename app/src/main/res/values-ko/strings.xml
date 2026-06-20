@@ -83,6 +83,7 @@
     <string name="language_korean">한국어</string>
     <string name="language_japanese">日本語</string>
     <string name="language_chinese">简体中文</string>
+    <string name="language_russian">러시아어 (Russian)</string>
     <string name="settings_theme_helper">컴패니언 앱의 표시 방식을 선택합니다.</string>
     <string name="settings_language_helper">기본값은 시스템 언어를 따릅니다. 영어, 한국어, 일본어를 강제로 선택할 수도 있습니다.</string>
     <string name="settings_theme_summary">현재: %1$s</string>
@@ -100,6 +101,14 @@
     <string name="safe_mode_hide_system_apps">시스템 앱 숨기기</string>
     <string name="settings_section_preset_mode">프리셋 및 모드</string>
     <string name="settings_section_identity">기기 정보</string>
+    <string name="settings_section_proxy">프록시</string>
+    <string name="settings_field_proxy_enabled">SOCKS5 프록시 사용</string>
+    <string name="settings_field_proxy_host">호스트</string>
+    <string name="settings_field_proxy_port">포트</string>
+    <string name="settings_button_check_proxy">프록시 확인</string>
+    <string name="proxy_checking">연결 확인 중...</string>
+    <string name="proxy_success">프록시 OK: %1$s (%2$s)</string>
+    <string name="proxy_failed">프록시 확인 실패: %1$s</string>
     <string name="settings_section_build_display">빌드 및 디스플레이</string>
     <string name="settings_section_network_region">네트워크 및 지역</string>
     <string name="settings_section_advanced">고급 설정</string>
